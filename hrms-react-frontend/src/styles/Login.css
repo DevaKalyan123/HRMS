@@ -1,0 +1,381 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: #87ceeb;
+}
+
+/* =========================
+   LOGIN BACKGROUND
+========================= */
+
+.login-container {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+
+  background: linear-gradient(
+    135deg,
+    #87ceeb,
+    #f0f8ff
+  );
+}
+
+/* =========================
+   SPLASH SCREEN
+========================= */
+
+#splash-screen {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+}
+
+#splash-screen img {
+  width: 100px;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================
+   LOGIN CARD
+========================= */
+
+.login-form-box {
+  width: 100%;
+  max-width: 405px;
+
+  background: white;
+
+  padding: 28px 33px 34px;
+
+  border-radius: 10px;
+
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+  text-align: center;
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.login-logo {
+  width: 75px;
+  height: auto;
+
+  display: block;
+
+  margin: 0 auto 18px;
+}
+
+/* =========================
+   LOGIN HEADING
+========================= */
+
+.login-form-box h2 {
+  margin: 0 0 20px;
+
+  color: #333;
+
+  font-size: 27px;
+  font-weight: 600;
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
+.flash-messages {
+  padding: 10px;
+
+  margin: 10px 0;
+
+  border-radius: 5px;
+
+  font-size: 14px;
+}
+
+.flash-messages.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.flash-messages.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* =========================
+   INPUT
+========================= */
+
+.input-group {
+  width: 100%;
+
+  margin-bottom: 17px;
+
+  position: relative;
+}
+
+.input-group input {
+  width: 100%;
+  height: 50px;
+
+  padding: 12px;
+
+  border: 1px solid #d0d5dc;
+
+  border-radius: 6px;
+
+  background: #fff;
+
+  color: #222;
+
+  font-size: 16px;
+
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: #007bff;
+}
+
+.input-group input::placeholder {
+  color: #777;
+}
+
+/* =========================
+   BROWSER AUTOFILL
+========================= */
+
+.input-group input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #eaf2ff inset;
+  -webkit-text-fill-color: #111;
+}
+
+/* =========================
+   PASSWORD
+========================= */
+
+.password-group input {
+  padding-right: 45px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  color: #555;
+  cursor: pointer;
+}
+
+.password-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.password-toggle:hover {
+  color: #555;
+}
+/* =========================
+   LOGIN BUTTON
+========================= */
+
+.login-btn {
+  width: 100%;
+  height: 45px;
+
+  margin-top: 0;
+
+  background: #007bff;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 5px;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background: #0073ed;
+}
+
+.login-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* =========================
+   LINKS
+========================= */
+
+.redirect-links {
+  margin-top: 16px;
+
+  text-align: center;
+
+  font-size: 16px;
+
+  line-height: 1.4;
+}
+
+.redirect-links a {
+  color: #007bff;
+
+  text-decoration: none;
+
+  font-size: 16px;
+}
+
+.redirect-links a:hover {
+  text-decoration: underline;
+}
+
+.redirect-links a + a {
+  margin-left: 5px;
+}
+
+/* =========================
+   ADMIN MODAL
+========================= */
+
+.admin-modal {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  z-index: 10000;
+}
+
+.admin-modal-content {
+  width: 320px;
+
+  padding: 30px;
+
+  background: white;
+
+  border-radius: 12px;
+
+  text-align: center;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.admin-modal-content h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.admin-modal-content p {
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.modal-buttons {
+  display: flex;
+
+  justify-content: space-around;
+
+  gap: 15px;
+}
+
+.modal-btn {
+  width: 45%;
+
+  padding: 10px 20px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  font-size: 16px;
+
+  cursor: pointer;
+}
+
+.admin-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.user-btn {
+  background: #28a745;
+  color: white;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 15px;
+  }
+
+  .login-form-box {
+    max-width: 405px;
+  }
+}

@@ -1,0 +1,12 @@
+.env
+backend/.env
+
+__pycache__/
+*.pyc
+
+venv/
+
+backend/static/uploads/attendance/
+
+.vscode/
+__pycache__/
