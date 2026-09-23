@@ -1,0 +1,55 @@
+.admin-layout #users .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-layout #users table,
+.admin-layout #users-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+}
+
+.admin-layout #users th {
+    background: #f8f9fa;
+    color: #495057;
+    font-size: 13px;
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.admin-layout #users td {
+    padding: 12px;
+    border-bottom: 1px solid #edf0f2;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.admin-layout .user-profile-img {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.admin-layout #users-table .btn,
+.admin-layout #users-table button {
+    width: auto;
+    min-width: 0;
+    padding: 6px 9px;
+    margin-right: 3px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.admin-layout #users-table .btn-primary {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+}
+
+.admin-layout #users-table .btn-danger {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}

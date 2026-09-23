@@ -1,0 +1,265 @@
+.admin-layout #manage-leaves {
+    padding-top: 30px;
+}
+
+.admin-layout .lv-body {
+    width: 100%;
+}
+
+.admin-layout .stats-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.admin-layout .stat-card {
+    min-height: 145px;
+    padding: 18px 20px;
+    background: #fff;
+    border-radius: 12px;
+    border-top: 3px solid #4f46e5;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+
+.admin-layout .stat-card.total {
+    border-top-color: #4f46e5;
+}
+
+.admin-layout .stat-card.pending {
+    border-top-color: #f59e0b;
+}
+
+.admin-layout .stat-card.approved {
+    border-top-color: #10b981;
+}
+
+.admin-layout .stat-card.rejected {
+    border-top-color: #ef4444;
+}
+
+.admin-layout .stat-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.admin-layout .stat-card.pending .stat-icon {
+    background: #fff4d6;
+    color: #f59e0b;
+}
+
+.admin-layout .stat-card.approved .stat-icon {
+    background: #dcfce7;
+    color: #10b981;
+}
+
+.admin-layout .stat-card.rejected .stat-icon {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.admin-layout .stat-label {
+    color: #718096;
+    font-size: 12px;
+    letter-spacing: .8px;
+    margin-bottom: 5px;
+}
+
+.admin-layout .stat-value {
+    color: #374151;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.admin-layout .stat-card.total .stat-value {
+    color: #4f46e5;
+}
+
+.admin-layout .stat-card.pending .stat-value {
+    color: #d97706;
+}
+
+.admin-layout .stat-card.approved .stat-value {
+    color: #10b981;
+}
+
+.admin-layout .stat-card.rejected .stat-value {
+    color: #ef4444;
+}
+
+.admin-layout .filter-bar {
+    width: 100%;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+
+.admin-layout .filter-select,
+.admin-layout .filter-input {
+    height: 38px;
+    padding: 7px 12px;
+    border: 1px solid #d7dce3;
+    border-radius: 7px;
+    background: #fff;
+    color: #1f2937;
+    font-size: 14px;
+}
+
+.admin-layout .filter-input {
+    width: 190px;
+}
+
+.admin-layout .row-count {
+    margin-left: auto;
+    color: #718096;
+    font-size: 13px;
+}
+
+.admin-layout .table-card {
+    width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07);
+    overflow: hidden;
+}
+
+.admin-layout .table-card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-layout .table-card th {
+    padding: 14px 12px;
+    background: #fafbfc;
+    color: #718096;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.admin-layout .table-card td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.admin-layout .employee-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-layout .avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #7480f5;
+    color: #fff;
+    font-weight: 600;
+}
+
+.admin-layout .emp-name {
+    color: #111827;
+    font-weight: 600;
+}
+
+.admin-layout .emp-email {
+    margin-top: 2px;
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+.admin-layout .lt-pill,
+.admin-layout .badge-status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.admin-layout .lt-paid,
+.admin-layout .badge-approved {
+    background: #dcfce7;
+    color: #10b981;
+}
+
+.admin-layout .lt-emergency {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.admin-layout .lt-sick {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.admin-layout .badge-pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.admin-layout .badge-rejected {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.admin-layout .actions-cell {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: nowrap;
+}
+
+.admin-layout .btn-approve,
+.admin-layout .btn-reject,
+.admin-layout .btn-emp-dl {
+    border: 0;
+    border-radius: 6px;
+    padding: 7px 11px;
+    color: #fff;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.admin-layout .btn-approve {
+    background: #16a34a;
+}
+
+.admin-layout .btn-reject {
+    background: #dc2626;
+}
+
+.admin-layout .btn-emp-dl {
+    background: #2563eb;
+}
+
+.admin-layout .no-action-text {
+    color: #9ca3af;
+    white-space: nowrap;
+}

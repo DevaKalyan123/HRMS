@@ -344,11 +344,11 @@ export default function UserDashboard(props) {
   }, []);
 
   // ---- Navigation ----
- const switchSection = useCallback((sectionId) => {
-  setActiveSection(sectionId);
-  window.location.hash = sectionId;
-  setSidebarOpen(false);
-}, []);
+  const switchSection = useCallback((sectionId) => {
+    setActiveSection(sectionId);
+    window.location.hash = sectionId;
+    setSidebarOpen(false);
+  }, []);
 
   // ---- Liveness camera ----
   const stopStream = useCallback(() => {
@@ -1129,7 +1129,7 @@ export default function UserDashboard(props) {
           <div className="header" id="globalHeader">
             <h1 id="globalWelcome">Welcome, {username}</h1>
             <button
-              className="toggle-btn d-lg-none"
+              className="toggle-btn"
               type="button"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open menu"
@@ -1594,6 +1594,7 @@ export default function UserDashboard(props) {
                               type="date"
                               name="from_date"
                               className="dt-date-input"
+                              min={todayStr}
                               required
                             />
                           </div>

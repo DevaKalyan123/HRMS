@@ -1,4 +1,6 @@
 # admin.py
+import email
+import email
 from fileinput import filename
 
 from flask import Blueprint, request, render_template, jsonify, session, flash, redirect, url_for, send_file
@@ -570,13 +572,29 @@ def admin_update_user(user_id):
     if not session.get('is_admin'):
         return jsonify({"success": False, "message": "Access denied"})
 
-    username = request.form.get('username')
-    email = request.form.get('email')
-    position = request.form.get('position')
+    username = request.form.get('username', '').strip()
+    email = request.form.get('email', '').strip().lower()
+    position = request.form.get('position', '').strip()
     face_image = request.files.get('face_image')
 
     if not username and not email and not position and not face_image:
-        return jsonify({"success": False, "message": "No changes provided"})
+        return jsonify({
+            "success": False,
+            "message": "No changes provided"
+        })
+# =====================================================
+# EMAIL VALIDATION
+# Allow only Jhaishna company email or Gmail
+# =====================================================
+    if email:
+        if not (
+            email.endswith('@jhaishna.com') or
+            email.endswith('@gmail.com')
+        ):
+            return jsonify({
+                "success": False,
+                "message": "Please use a valid Jhaishna company email (@jhaishna.com) or Gmail address (@gmail.com)"
+            }), 400
 
     conn = get_db_connection()
     if not conn:
@@ -986,8 +1004,18 @@ def update_profile():
     cursor = conn.cursor()
 
     try:
-        email = request.form.get('email')
+        email = request.form.get('email', '').strip().lower()
         face_image = request.files.get('face_image')
+
+        # Allow only Jhaishna company email or Gmail
+        if not (
+            email.endswith('@jhaishna.com') or
+            email.endswith('@gmail.com')
+        ):
+            return jsonify({
+                "success": False,
+                "message": "Please use a valid Jhaishna company email (@jhaishna.com) or Gmail address (@gmail.com)"
+            }), 400
 
         if face_image and face_image.filename != '':
             image_data = face_image.read()

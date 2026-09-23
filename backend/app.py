@@ -33,24 +33,22 @@ app.secret_key = "secret123"
 
 app.config["SESSION_COOKIE_NAME"] = "hrms_session"
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"] = False
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_PATH"] = "/"
 
 
 # ============================================================
 # CORS CONFIGURATION
-# React frontend:
-# http://localhost:5173
-#
-# Flask backend:
-# http://localhost:5000
-# ============================================================
+
 
 CORS(
     app,
     origins=[
+        "https://cbz6k2gf-5173.inc1.devtunnels.ms",
         "http://localhost:5173",
         "http://127.0.0.1:5173"
+
     ],
     supports_credentials=True
 )

@@ -1,0 +1,157 @@
+.admin-layout .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0,0,0,.55);
+}
+
+.admin-layout .modal-dialog {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+}
+
+.admin-layout .modal-content {
+    width: 100%;
+    background: #fff;
+    border-radius: 10px;
+    border: 0;
+    box-shadow: 0 10px 40px rgba(0,0,0,.25);
+    overflow: hidden;
+}
+
+.admin-layout .confirm-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.admin-layout .confirm-title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.admin-layout .confirm-body {
+    color: #6b7280;
+    margin: 15px 0;
+}
+
+.admin-layout .confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.admin-layout .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-layout .modal-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.admin-layout .modal-body {
+    padding: 22px;
+}
+
+.admin-layout .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 22px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.admin-layout .modal-body .form-control,
+.admin-layout .modal-body .form-select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    color: #111827;
+    font-size: 14px;
+    outline: none;
+}
+
+.admin-layout .modal-body .form-control:focus,
+.admin-layout .modal-body .form-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+.admin-layout .modal-footer button {
+    border: none;
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.admin-layout .modal-btn {
+    border: none;
+    border-radius: 7px;
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+.admin-layout .modal-btn-cancel {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.admin-layout .modal-btn-approve {
+    background: #2563eb;
+    color: #fff;
+}
+
+.admin-layout .btn-secondary {
+    background: #6b7280;
+    color: #fff;
+}
+
+.admin-layout .btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+
+.admin-layout .form-label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.admin-layout .mb-3 {
+    margin-bottom: 18px;
+}
+
+.admin-layout .btn-close {
+    border: none;
+    background: transparent;
+    font-size: 25px;
+    line-height: 1;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+}
+
+.admin-layout .btn-close:hover {
+    color: #111827;
+}

@@ -235,51 +235,139 @@ def check_admin():
 @dashboard_bp.route('/add-task', methods=['POST'])
 def add_task():
 
-    project_name = request.form.get('project_name')
+    # Check login
+    if 'user_id' not in session:
+        return {
+            "success": False,
+            "message": "User not logged in"
+        }, 401
 
-    task_name = request.form.get('task_name')
-    
+    # Get form values
+    project_name = (request.form.get('project_name') or '').strip()
+    task_name = (request.form.get('task_name') or '').strip()
+
     from_date = request.form.get('from_date')
-    
     to_date = request.form.get('to_date')
-    
+
+    # Validate required fields
+    if not project_name or not task_name or not from_date or not to_date:
+        return {
+            "success": False,
+            "message": "All task fields are required"
+        }, 400
+
+    # Validate date order
+    try:
+        start_date = datetime.strptime(
+            from_date,
+            "%Y-%m-%d"
+        ).date()
+
+        end_date = datetime.strptime(
+            to_date,
+            "%Y-%m-%d"
+        ).date()
+
+        if start_date > end_date:
+            return {
+                "success": False,
+                "message": "To Date cannot be before From Date"
+            }, 400
+
+    except ValueError:
+        return {
+            "success": False,
+            "message": "Invalid date format"
+        }, 400
+
     time_period = f"{from_date} To {to_date}"
 
     conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    cursor = conn.cursor()
+    try:
 
-    cursor.execute("""
+        # ============================================================
+        # CHECK DUPLICATE TASK
+        # Same employee + project + task + time period
+        # ============================================================
 
-        INSERT INTO daily_tasks
-        (
-            employee_id,
+        cursor.execute("""
+            SELECT id, status
+            FROM daily_tasks
+            WHERE employee_id = %s
+              AND LOWER(TRIM(project_name)) = LOWER(TRIM(%s))
+              AND LOWER(TRIM(task_name)) = LOWER(TRIM(%s))
+              AND time_period = %s
+            LIMIT 1
+        """, (
+            session['user_id'],
             project_name,
             task_name,
             time_period
-        )
+        ))
 
-        VALUES (%s, %s, %s, %s)
+        existing_task = cursor.fetchone()
 
-    """, (
+        if existing_task:
 
-        session['user_id'],
-        project_name,
-        task_name,
-        time_period
+            current_status = (
+                existing_task.get('status')
+                or 'Pending'
+            )
 
-    ))
+            return {
+                "success": False,
+                "duplicate": True,
+                "message": (
+                    "This task has already been submitted "
+                    "for the selected time period. "
+                    f"Current status: {current_status}."
+                )
+            }, 409
 
-    conn.commit()
-    cursor.close()
+        # ============================================================
+        # INSERT NEW TASK
+        # ============================================================
 
-    conn.close()
+        cursor.execute("""
+            INSERT INTO daily_tasks
+            (
+                employee_id,
+                project_name,
+                task_name,
+                time_period
+            )
+            VALUES (%s, %s, %s, %s)
+        """, (
+            session['user_id'],
+            project_name,
+            task_name,
+            time_period
+        ))
 
-    return {
-    "success": True,
-    "message": "Daily task added successfully"
-}
+        conn.commit()
 
+        return {
+            "success": True,
+            "message": "Daily task added successfully"
+        }, 200
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("❌ ADD TASK ERROR:", str(e))
+
+        return {
+            "success": False,
+            "message": "Failed to add daily task"
+        }, 500
+
+    finally:
+
+        cursor.close()
+        conn.close()
 
 # ============================================================
 # REACT DASHBOARD API
