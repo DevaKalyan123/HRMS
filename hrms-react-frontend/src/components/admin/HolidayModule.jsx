@@ -1,75 +1,165 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-
-import {
-  uploadHoliday,
-} from "../../services/adminService";
+import { useEffect, useState } from "react";
+import { uploadHoliday } from "../../services/adminService";
 
 function HolidayModule({
   holidayTable: holidayTableData = "",
 }) {
   const [holidayTable, setHolidayTable] =
-    useState(
-      holidayTableData
-    );
+    useState(holidayTableData);
+
+  const [selectedFile, setSelectedFile] =
+    useState(null);
+
+  const [uploading, setUploading] =
+    useState(false);
 
   useEffect(() => {
-    setHolidayTable(
-      holidayTableData || ""
-    );
+    setHolidayTable(holidayTableData || "");
   }, [holidayTableData]);
 
-  const handleHolidayUpload =
-    async (event) => {
-      event.preventDefault();
+  // ============================================================
+  // FILE SELECTION
+  // ============================================================
 
-      const file =
-        event.currentTarget.elements
-          .holiday_image.files[0];
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
 
-      if (!file) {
-        alert(
-          "Please select a holiday file."
-        );
-        return;
-      }
+    if (!file) {
+      setSelectedFile(null);
+      return;
+    }
 
-      try {
-        const result =
-          await uploadHoliday(file);
+    const fileName = file.name.toLowerCase();
 
-        if (!result.success) {
-          throw new Error(
-            result.message ||
-              "Failed to upload holiday list"
-          );
-        }
+    const allowedExtensions = [
+      ".docx",
+      ".xls",
+      ".xlsx",
+      ".csv",
+    ];
 
-        if (
-          result.holiday_table
-        ) {
-          setHolidayTable(
-            result.holiday_table
-          );
-        }
+    const isAllowed = allowedExtensions.some(
+      (extension) => fileName.endsWith(extension)
+    );
 
-        alert(
-          "Holiday list uploaded successfully."
-        );
-      } catch (error) {
-        console.error(
-          "Holiday upload error:",
-          error
-        );
+    if (!isAllowed) {
+      alert(
+        "Unsupported file format. Please upload a DOCX, XLS, XLSX, or CSV file."
+      );
 
-        alert(
-          error.message ||
+      event.target.value = "";
+      setSelectedFile(null);
+      return;
+    }
+
+    // Explicitly reject PDF
+    if (fileName.endsWith(".pdf")) {
+      alert(
+        "PDF files are not supported for the Holiday List. Please upload a DOCX, XLS, XLSX, or CSV file."
+      );
+
+      event.target.value = "";
+      setSelectedFile(null);
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
+  // ============================================================
+  // UPLOAD HOLIDAY
+  // ============================================================
+
+  const handleHolidayUpload = async (event) => {
+    event.preventDefault();
+
+    if (!selectedFile) {
+      alert("Please select a holiday list file.");
+      return;
+    }
+
+    const fileName =
+      selectedFile.name.toLowerCase();
+
+    const allowedExtensions = [
+      ".docx",
+      ".xls",
+      ".xlsx",
+      ".csv",
+    ];
+
+    const isAllowed = allowedExtensions.some(
+      (extension) => fileName.endsWith(extension)
+    );
+
+    if (!isAllowed) {
+      alert(
+        "Unsupported file format. Please upload a DOCX, XLS, XLSX, or CSV file."
+      );
+      return;
+    }
+
+    // Extra PDF protection
+    if (fileName.endsWith(".pdf")) {
+      alert(
+        "PDF files are not supported for the Holiday List."
+      );
+      return;
+    }
+
+    try {
+      setUploading(true);
+
+      const result =
+        await uploadHoliday(selectedFile);
+
+      if (!result?.success) {
+        throw new Error(
+          result?.message ||
             "Failed to upload holiday list."
         );
       }
-    };
+
+      // Update Current Holiday List immediately
+      if (result.holiday_table) {
+        setHolidayTable(
+          result.holiday_table
+        );
+      }
+
+      // Clear selected file
+      setSelectedFile(null);
+
+      const fileInput =
+        document.querySelector(
+          'input[name="holiday_image"]'
+        );
+
+      if (fileInput) {
+        fileInput.value = "";
+      }
+
+      alert(
+        "Holiday list uploaded successfully."
+      );
+    } catch (error) {
+      console.error(
+        "Holiday upload error:",
+        error
+      );
+
+      alert(
+        error?.message ||
+          "Failed to upload holiday list."
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // ============================================================
+  // UI
+  // ============================================================
 
   return (
     <section
@@ -85,43 +175,71 @@ function HolidayModule({
         <div className="card-body">
 
           <form
-            onSubmit={
-              handleHolidayUpload
-            }
+            onSubmit={handleHolidayUpload}
           >
 
             <div className="mb-3">
 
-              <label className="form-label fw-semibold">
-                <i className="fas fa-file-excel me-1" />
-                Select Excel / CSV / Word File
+              <label
+                className="form-label fw-semibold"
+                htmlFor="holidayFile"
+              >
+                <i className="fas fa-file-alt me-1" />
+                Select Holiday List
               </label>
 
               <input
+                id="holidayFile"
                 type="file"
                 name="holiday_image"
-                accept=".doc,.docx,.xls,.xlsx,.csv"
+                accept=".docx,.xls,.xlsx,.csv"
                 className="form-control"
+                onChange={handleFileChange}
                 required
               />
 
               <div className="form-text">
                 Supported formats:
-                .doc, .docx, .xls,
-                .xlsx, .csv
+                {" "}
+                .docx, .xls, .xlsx, .csv
               </div>
+
+              {selectedFile && (
+                <div className="mt-2">
+                  <small className="text-muted">
+                    Selected file:{" "}
+                    <strong>
+                      {selectedFile.name}
+                    </strong>
+                  </small>
+                </div>
+              )}
 
             </div>
 
             <button
               type="submit"
               className="btn btn-primary"
+              disabled={uploading}
             >
-              <i className="fas fa-upload me-1" />
-              Upload Holiday List
+              {uploading ? (
+                <>
+                  <i className="fas fa-spinner fa-spin me-1" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-upload me-1" />
+                  Upload Holiday List
+                </>
+              )}
             </button>
 
           </form>
+
+          {/* ==================================================
+              CURRENT HOLIDAY LIST
+          ================================================== */}
 
           {holidayTable ? (
             <div className="mt-4">
@@ -133,16 +251,14 @@ function HolidayModule({
               <div
                 className="table-responsive holiday-preview-wrap"
                 dangerouslySetInnerHTML={{
-                  __html:
-                    holidayTable,
+                  __html: holidayTable,
                 }}
               />
 
             </div>
           ) : (
             <p className="mt-3 text-muted">
-              No holiday list
-              uploaded yet.
+              No holiday list uploaded yet.
             </p>
           )}
 

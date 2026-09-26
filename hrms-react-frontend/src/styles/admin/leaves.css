@@ -1,265 +1,1650 @@
-.admin-layout #manage-leaves {
-    padding-top: 30px;
+/* ============================================================
+   MANAGE LEAVES
+   ============================================================ */
+
+#manage-leaves {
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.admin-layout .lv-body {
+#manage-leaves * {
+  box-sizing: border-box;
+}
+
+#manage-leaves .lv-body {
+  width: 100%;
+  padding: 28px 34px 40px;
+  background: #f5f7fb;
+}
+
+
+/* ============================================================
+   PAGE HEADING
+   ============================================================ */
+
+#manage-leaves .leave-page-heading {
+  margin-bottom: 22px;
+}
+
+#manage-leaves .leave-page-heading h2 {
+  margin: 0;
+  color: #17233c;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+#manage-leaves .leave-page-heading p {
+  margin: 7px 0 0;
+  color: #7b879c;
+  font-size: 14px;
+}
+
+
+/* ============================================================
+   STATISTICS
+   ============================================================ */
+
+#manage-leaves .stats-row {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+#manage-leaves .stat-card {
+  position: relative;
+
+  min-height: 108px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 18px 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5eaf2;
+  border-radius: 10px;
+
+  box-shadow:
+    0 2px 8px rgba(25, 42, 70, 0.04);
+
+  overflow: hidden;
+}
+
+#manage-leaves .stat-card::before {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  width: 3px;
+}
+
+#manage-leaves .stat-card.total::before {
+  background: #5968f2;
+}
+
+#manage-leaves .stat-card.pending::before {
+  background: #f2a900;
+}
+
+#manage-leaves .stat-card.approved::before {
+  background: #16b364;
+}
+
+#manage-leaves .stat-card.rejected::before {
+  background: #ef4444;
+}
+
+
+/* ICON */
+
+#manage-leaves .stat-icon {
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 20px;
+}
+
+#manage-leaves .stat-card.total .stat-icon {
+  color: #4f5ee8;
+  background: #eef0ff;
+}
+
+#manage-leaves .stat-card.pending .stat-icon {
+  color: #d99300;
+  background: #fff5d9;
+}
+
+#manage-leaves .stat-card.approved .stat-icon {
+  color: #119c58;
+  background: #e5f8ee;
+}
+
+#manage-leaves .stat-card.rejected .stat-icon {
+  color: #e33b3b;
+  background: #ffe9e9;
+}
+
+
+/* CONTENT */
+
+#manage-leaves .stat-content {
+  min-width: 0;
+}
+
+#manage-leaves .stat-label {
+  color: #7b879c;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 0.4px;
+}
+
+#manage-leaves .stat-value {
+  margin-top: 5px;
+
+  font-size: 26px;
+  line-height: 1;
+
+  font-weight: 700;
+}
+
+#manage-leaves .stat-card.total .stat-value {
+  color: #4054df;
+}
+
+#manage-leaves .stat-card.pending .stat-value {
+  color: #d89100;
+}
+
+#manage-leaves .stat-card.approved .stat-value {
+  color: #0c9b53;
+}
+
+#manage-leaves .stat-card.rejected .stat-value {
+  color: #e23737;
+}
+
+
+/* ============================================================
+   FILTER BAR
+   ============================================================ */
+
+#manage-leaves .filter-bar {
+  width: 100%;
+
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 12px 16px;
+
+  margin-bottom: 16px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5eaf2;
+  border-radius: 10px;
+
+  box-shadow:
+    0 2px 8px rgba(25, 42, 70, 0.035);
+}
+
+#manage-leaves .filter-left {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+#manage-leaves .filter-control {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+#manage-leaves .filter-control > i {
+  position: absolute;
+  left: 13px;
+
+  color: #738099;
+
+  font-size: 13px;
+
+  pointer-events: none;
+
+  z-index: 2;
+}
+
+#manage-leaves .filter-select {
+  height: 40px;
+
+  min-width: 165px;
+
+  padding: 0 35px 0 35px;
+
+  border: 1px solid #dfe5ef;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #374151;
+
+  font-size: 13px;
+
+  outline: none;
+
+  cursor: pointer;
+}
+
+#manage-leaves .filter-select:focus {
+  border-color: #6573e8;
+
+  box-shadow:
+    0 0 0 3px rgba(101, 115, 232, 0.1);
+}
+
+
+/* SEARCH */
+
+#manage-leaves .leave-search-box {
+  position: relative;
+
+  height: 40px;
+
+  flex: 1;
+
+  max-width: 390px;
+
+  display: flex;
+  align-items: center;
+}
+
+#manage-leaves .leave-search-box > i {
+  position: absolute;
+  left: 13px;
+
+  color: #8490a5;
+
+  font-size: 13px;
+
+  pointer-events: none;
+}
+
+#manage-leaves .leave-search-box input {
+  width: 100%;
+  height: 100%;
+
+  padding: 0 38px 0 36px;
+
+  border: 1px solid #dfe5ef;
+  border-radius: 7px;
+
+  outline: none;
+
+  color: #344054;
+
+  font-size: 13px;
+
+  background: #ffffff;
+}
+
+#manage-leaves .leave-search-box input::placeholder {
+  color: #9aa5b5;
+}
+
+#manage-leaves .leave-search-box input:focus {
+  border-color: #6573e8;
+
+  box-shadow:
+    0 0 0 3px rgba(101, 115, 232, 0.1);
+}
+
+#manage-leaves .clear-search {
+  position: absolute;
+  right: 8px;
+
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f1f3f7;
+  color: #6b7280;
+
+  cursor: pointer;
+}
+
+#manage-leaves .clear-search:hover {
+  background: #e5e7eb;
+}
+
+
+/* RECORD COUNT */
+
+#manage-leaves .row-count {
+  flex-shrink: 0;
+
+  color: #68758a;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   TABLE CARD
+   ============================================================ */
+
+#manage-leaves .table-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #e4e9f1;
+  border-radius: 10px;
+
+  box-shadow:
+    0 2px 10px rgba(25, 42, 70, 0.04);
+
+  overflow: hidden;
+}
+
+#manage-leaves .table-responsive {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+#manage-leaves #leavesTable {
+  width: 100%;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  table-layout: fixed;
+
+  color: #344054;
+
+  font-size: 12px;
+}
+
+#manage-leaves #leavesTable th {
+  height: 48px;
+
+  padding: 0 12px;
+
+  background: #f8fafc;
+
+  border-bottom: 1px solid #e5e9f0;
+
+  color: #536176;
+
+  text-align: left;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.35px;
+
+  white-space: nowrap;
+}
+
+#manage-leaves #leavesTable td {
+  min-height: 68px;
+
+  padding: 10px 12px;
+
+  border-bottom: 1px solid #edf0f5;
+
+  vertical-align: middle;
+
+  overflow: hidden;
+}
+
+#manage-leaves #leavesTable tbody tr {
+  transition: background 0.15s ease;
+}
+
+#manage-leaves #leavesTable tbody tr:hover {
+  background: #fafbfe;
+}
+
+#manage-leaves #leavesTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* ============================================================
+   COLUMN WIDTHS
+   ============================================================ */
+
+#manage-leaves .col-number {
+  width: 42px;
+}
+
+#manage-leaves .col-employee {
+  width: 190px;
+}
+
+#manage-leaves .col-type {
+  width: 125px;
+}
+
+#manage-leaves .col-date {
+  width: 105px;
+}
+
+#manage-leaves .col-days {
+  width: 55px;
+}
+
+#manage-leaves .col-status {
+  width: 95px;
+}
+
+#manage-leaves .col-reason {
+  width: 250px;
+}
+
+#manage-leaves .col-remarks {
+  width: 250px;
+}
+
+#manage-leaves .col-actions {
+  width: 180px;
+}
+
+
+/* ============================================================
+   NUMBER
+   ============================================================ */
+
+#manage-leaves .number-cell {
+  color: #69778e;
+
+  text-align: center;
+
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   EMPLOYEE
+   ============================================================ */
+
+#manage-leaves .employee-cell {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 0;
+}
+
+#manage-leaves .employee-avatar {
+  width: 36px;
+  height: 36px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #5968ee;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  box-shadow:
+    0 2px 5px rgba(89, 104, 238, 0.22);
+}
+
+#manage-leaves .employee-info {
+  min-width: 0;
+}
+
+#manage-leaves .emp-name {
+  color: #27364f;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#manage-leaves .emp-email {
+  margin-top: 3px;
+
+  color: #8a96a8;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ============================================================
+   LEAVE TYPE BADGES
+   ============================================================ */
+
+#manage-leaves .lt-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 27px;
+
+  padding: 5px 9px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+#manage-leaves .lt-paid {
+  color: #e23b4f;
+  background: #ffe6ea;
+}
+
+#manage-leaves .lt-sick {
+  color: #15985b;
+  background: #ddf8e9;
+}
+
+#manage-leaves .lt-emergency {
+  color: #dd3e52;
+  background: #ffe4e8;
+}
+
+
+/* ============================================================
+   DATE / DAYS
+   ============================================================ */
+
+#manage-leaves .date-cell {
+  color: #59677d;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+}
+
+#manage-leaves .days-cell {
+  color: #475467;
+
+  font-weight: 700;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+#manage-leaves .badge-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 72px;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+#manage-leaves .badge-approved {
+  color: #159653;
+  background: #ddf8e9;
+}
+
+#manage-leaves .badge-rejected {
+  color: #e23949;
+  background: #ffe4e8;
+}
+
+#manage-leaves .badge-pending {
+  color: #c98600;
+  background: #fff1cf;
+}
+
+
+/* ============================================================
+   EMPLOYEE REASON
+   ============================================================ */
+
+#manage-leaves .leave-reason {
+  width: 100%;
+  max-width: 100%;
+
+  overflow: hidden;
+}
+
+#manage-leaves .reason-preview {
+  width: 100%;
+  max-width: 100%;
+
+  min-height: 40px;
+  max-height: 58px;
+
+  padding: 7px 9px;
+
+  border: 1px solid #dce3ee;
+  border-radius: 7px;
+
+  background: #f4f7ff;
+
+  color: #3f4f67;
+
+  font-size: 11px;
+
+  line-height: 1.45;
+
+  white-space: normal;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  overflow-y: auto;
+}
+
+#manage-leaves .reason-preview::-webkit-scrollbar {
+  width: 5px;
+}
+
+#manage-leaves .reason-preview::-webkit-scrollbar-track {
+  background: #eef1f5;
+}
+
+#manage-leaves .reason-preview::-webkit-scrollbar-thumb {
+  background: #c8d0dc;
+
+  border-radius: 5px;
+}
+
+#manage-leaves .reason-empty {
+  color: #a0a9b8;
+}
+
+
+/* ============================================================
+   ADMIN REMARKS
+   ============================================================ */
+
+#manage-leaves .leave-remarks {
+  width: 100%;
+  max-width: 100%;
+
+  overflow: hidden;
+}
+
+#manage-leaves .remarks-preview {
+  width: 100%;
+  max-width: 100%;
+
+  min-height: 40px;
+  max-height: 58px;
+
+  padding: 7px 9px;
+
+  border: 1px solid #e1e6ee;
+  border-radius: 7px;
+
+  background: #f8fafc;
+
+  color: #46546a;
+
+  font-size: 11px;
+
+  line-height: 1.45;
+
+  white-space: normal;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  overflow-y: auto;
+}
+
+#manage-leaves .remarks-preview::-webkit-scrollbar {
+  width: 5px;
+}
+
+#manage-leaves .remarks-preview::-webkit-scrollbar-track {
+  background: #eef1f5;
+}
+
+#manage-leaves .remarks-preview::-webkit-scrollbar-thumb {
+  background: #c8d0dc;
+
+  border-radius: 5px;
+}
+
+#manage-leaves .remarks-empty {
+  color: #a0a9b8;
+}
+
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+#manage-leaves .leave-actions-column {
+  width: 180px;
+
+  min-width: 180px;
+}
+
+#manage-leaves .actions-cell {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+#manage-leaves .leave-action-buttons {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 6px;
+
+  width: 100%;
+}
+
+#manage-leaves .leave-action-btn {
+  min-height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 6px 8px;
+
+  border: none;
+  border-radius: 6px;
+
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+#manage-leaves .approve-btn {
+  background: #16a35a;
+}
+
+#manage-leaves .approve-btn:hover {
+  background: #11894b;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 3px 8px rgba(22, 163, 90, 0.25);
+}
+
+#manage-leaves .reject-btn {
+  background: #e33c3c;
+}
+
+#manage-leaves .reject-btn:hover {
+  background: #c92f2f;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 3px 8px rgba(227, 60, 60, 0.25);
+}
+
+
+/* ============================================================
+   CSV
+   ============================================================ */
+
+#manage-leaves .employee-csv-btn {
+  width: 100%;
+
+  min-height: 31px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border: 1px solid #356ee8;
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  color: #356ee8;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+#manage-leaves .employee-csv-btn:hover {
+  background: #356ee8;
+  color: #ffffff;
+}
+
+
+/* ============================================================
+   NO ACTION
+   ============================================================ */
+
+#manage-leaves .no-action-text {
+  min-height: 31px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  background: #f5f7fa;
+
+  color: #9aa4b2;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+#manage-leaves .empty-state {
+  padding: 70px 20px;
+
+  text-align: center;
+}
+
+#manage-leaves .empty-icon {
+  width: 58px;
+  height: 58px;
+
+  margin: 0 auto 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eef1f7;
+
+  color: #8b96a8;
+
+  font-size: 23px;
+}
+
+#manage-leaves .empty-state h4 {
+  margin: 0;
+
+  color: #445168;
+
+  font-size: 16px;
+}
+
+#manage-leaves .empty-state p {
+  margin: 7px 0 0;
+
+  color: #929caf;
+
+  font-size: 13px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1200px) {
+
+  #manage-leaves .lv-body {
+    padding: 22px 20px 35px;
+  }
+
+  #manage-leaves .stats-row {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  #manage-leaves .col-reason {
+    width: 220px;
+  }
+
+  #manage-leaves .col-remarks {
+    width: 220px;
+  }
+
+}
+
+
+@media (max-width: 900px) {
+
+  #manage-leaves .filter-bar {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  #manage-leaves .filter-left {
     width: 100%;
-}
 
-.admin-layout .stats-row {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 22px;
-}
-
-.admin-layout .stat-card {
-    min-height: 145px;
-    padding: 18px 20px;
-    background: #fff;
-    border-radius: 12px;
-    border-top: 3px solid #4f46e5;
-    box-shadow: 0 2px 8px rgba(0,0,0,.07);
-}
-
-.admin-layout .stat-card.total {
-    border-top-color: #4f46e5;
-}
-
-.admin-layout .stat-card.pending {
-    border-top-color: #f59e0b;
-}
-
-.admin-layout .stat-card.approved {
-    border-top-color: #10b981;
-}
-
-.admin-layout .stat-card.rejected {
-    border-top-color: #ef4444;
-}
-
-.admin-layout .stat-icon {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    background: #eef2ff;
-    color: #4f46e5;
-}
-
-.admin-layout .stat-card.pending .stat-icon {
-    background: #fff4d6;
-    color: #f59e0b;
-}
-
-.admin-layout .stat-card.approved .stat-icon {
-    background: #dcfce7;
-    color: #10b981;
-}
-
-.admin-layout .stat-card.rejected .stat-icon {
-    background: #fee2e2;
-    color: #ef4444;
-}
-
-.admin-layout .stat-label {
-    color: #718096;
-    font-size: 12px;
-    letter-spacing: .8px;
-    margin-bottom: 5px;
-}
-
-.admin-layout .stat-value {
-    color: #374151;
-    font-size: 30px;
-    font-weight: 700;
-}
-
-.admin-layout .stat-card.total .stat-value {
-    color: #4f46e5;
-}
-
-.admin-layout .stat-card.pending .stat-value {
-    color: #d97706;
-}
-
-.admin-layout .stat-card.approved .stat-value {
-    color: #10b981;
-}
-
-.admin-layout .stat-card.rejected .stat-value {
-    color: #ef4444;
-}
-
-.admin-layout .filter-bar {
-    width: 100%;
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
     flex-wrap: wrap;
-    padding: 12px 16px;
-    margin-bottom: 18px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.07);
-}
+  }
 
-.admin-layout .filter-select,
-.admin-layout .filter-input {
-    height: 38px;
-    padding: 7px 12px;
-    border: 1px solid #d7dce3;
-    border-radius: 7px;
-    background: #fff;
-    color: #1f2937;
-    font-size: 14px;
-}
-
-.admin-layout .filter-input {
-    width: 190px;
-}
-
-.admin-layout .row-count {
-    margin-left: auto;
-    color: #718096;
-    font-size: 13px;
-}
-
-.admin-layout .table-card {
+  #manage-leaves .leave-search-box {
+    max-width: none;
     width: 100%;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.07);
-    overflow: hidden;
+  }
+
+  #manage-leaves .row-count {
+    align-self: flex-end;
+  }
+
 }
 
-.admin-layout .table-card table {
+
+@media (max-width: 650px) {
+
+  #manage-leaves .lv-body {
+    padding: 18px 12px 30px;
+  }
+
+  #manage-leaves .leave-page-heading h2 {
+    font-size: 23px;
+  }
+
+  #manage-leaves .stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  #manage-leaves .filter-left {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #manage-leaves .filter-control,
+  #manage-leaves .filter-select {
     width: 100%;
-    border-collapse: collapse;
+  }
+
+  #manage-leaves .leave-search-box {
+    width: 100%;
+  }
+
+  #manage-leaves .table-card {
+    overflow-x: auto;
+  }
+
+  #manage-leaves #leavesTable {
+    min-width: 1380px;
+  }
+
 }
 
-.admin-layout .table-card th {
-    padding: 14px 12px;
-    background: #fafbfc;
-    color: #718096;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    border-bottom: 1px solid #e5e7eb;
-    white-space: nowrap;
+/* ============================================================
+   LEAVE CONFIRMATION MODAL
+   ============================================================ */
+
+.leave-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(15, 23, 42, 0.62);
+  backdrop-filter: blur(2px);
 }
 
-.admin-layout .table-card td {
-    padding: 13px 12px;
-    border-bottom: 1px solid #e5e7eb;
-    font-size: 13px;
-    vertical-align: middle;
+
+/* ============================================================
+   MODAL BOX
+   ============================================================ */
+
+.leave-confirm-modal {
+  width: 100%;
+  max-width: 560px;
+
+  max-height: calc(100vh - 40px);
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 25px 60px rgba(15, 23, 42, 0.25);
+
+  overflow: hidden;
+
+  animation: leaveModalIn 0.18s ease-out;
 }
 
-.admin-layout .employee-cell {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+
+@keyframes leaveModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-.admin-layout .avatar {
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: #7480f5;
-    color: #fff;
-    font-weight: 600;
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.leave-modal-header {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 20px 22px;
+
+  border-bottom: 1px solid #edf0f4;
 }
 
-.admin-layout .emp-name {
-    color: #111827;
-    font-weight: 600;
+
+.leave-modal-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 17px;
 }
 
-.admin-layout .emp-email {
-    margin-top: 2px;
-    color: #9ca3af;
-    font-size: 11px;
+
+.approve-icon {
+  color: #159653;
+  background: #e4f8ed;
 }
 
-.admin-layout .lt-pill,
-.admin-layout .badge-status {
-    display: inline-block;
-    padding: 6px 10px;
-    border-radius: 15px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
+
+.reject-icon {
+  color: #dc3545;
+  background: #ffe7ea;
 }
 
-.admin-layout .lt-paid,
-.admin-layout .badge-approved {
-    background: #dcfce7;
-    color: #10b981;
+
+.leave-modal-title-area {
+  flex: 1;
+  min-width: 0;
 }
 
-.admin-layout .lt-emergency {
-    background: #fee2e2;
-    color: #ef4444;
+
+.leave-modal-title-area h3 {
+  margin: 0;
+
+  color: #17233c;
+
+  font-size: 19px;
+  font-weight: 700;
 }
 
-.admin-layout .lt-sick {
-    background: #fee2e2;
-    color: #dc2626;
+
+.leave-modal-title-area p {
+  margin: 4px 0 0;
+
+  color: #8792a5;
+
+  font-size: 12px;
 }
 
-.admin-layout .badge-pending {
-    background: #fef3c7;
-    color: #d97706;
+
+.leave-modal-close {
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #7d8899;
+
+  font-size: 15px;
+
+  cursor: pointer;
 }
 
-.admin-layout .badge-rejected {
-    background: #fee2e2;
-    color: #dc2626;
+
+.leave-modal-close:hover {
+  background: #f1f3f6;
+  color: #344054;
 }
 
-.admin-layout .actions-cell {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex-wrap: nowrap;
+
+/* ============================================================
+   BODY
+   ============================================================ */
+
+.leave-modal-body {
+  padding: 21px 22px;
+
+  overflow-y: auto;
 }
 
-.admin-layout .btn-approve,
-.admin-layout .btn-reject,
-.admin-layout .btn-emp-dl {
-    border: 0;
-    border-radius: 6px;
-    padding: 7px 11px;
-    color: #fff;
-    font-size: 13px;
-    white-space: nowrap;
-    cursor: pointer;
+
+.leave-confirm-question {
+  margin: 0 0 18px;
+
+  color: #536176;
+
+  font-size: 14px;
+
+  line-height: 1.5;
 }
 
-.admin-layout .btn-approve {
-    background: #16a34a;
+
+.leave-confirm-question strong {
+  color: #17233c;
 }
 
-.admin-layout .btn-reject {
-    background: #dc2626;
+
+/* ============================================================
+   EMPLOYEE DETAILS
+   ============================================================ */
+
+.leave-detail-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+
+  padding: 15px;
+
+  margin-bottom: 20px;
+
+  border: 1px solid #e8ecf2;
+
+  border-radius: 9px;
+
+  background: #f8fafc;
 }
 
-.admin-layout .btn-emp-dl {
-    background: #2563eb;
+
+.leave-detail-item {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
 }
 
-.admin-layout .no-action-text {
-    color: #9ca3af;
-    white-space: nowrap;
+
+.detail-label {
+  color: #8a95a6;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+}
+
+
+.detail-value {
+  color: #26344b;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  word-break: break-word;
+}
+
+
+/* ============================================================
+   REMARKS
+   ============================================================ */
+
+.leave-remarks-form {
+  width: 100%;
+}
+
+
+.remarks-label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #27364f;
+
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+
+.remarks-label span {
+  color: #8d98a9;
+
+  font-size: 11px;
+
+  font-weight: 400;
+}
+
+
+.remarks-textarea {
+  display: block;
+
+  width: 100%;
+
+  min-height: 100px;
+
+  max-height: 180px;
+
+  padding: 11px 12px;
+
+  margin: 0;
+
+  resize: vertical;
+
+  border: 1px solid #d8dee8;
+
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #344054;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+.remarks-textarea::placeholder {
+  color: #a0a9b7;
+}
+
+
+.remarks-textarea:focus {
+  border-color: #4f6ff0;
+
+  box-shadow:
+    0 0 0 3px rgba(79, 111, 240, 0.1);
+}
+
+
+.remarks-helper {
+  margin-top: 5px;
+
+  color: #98a2b3;
+
+  font-size: 10px;
+}
+
+
+/* ============================================================
+   FOOTER BUTTONS
+   ============================================================ */
+
+.leave-modal-footer {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+
+  padding: 16px 22px 20px;
+
+  border-top: 1px solid #edf0f4;
+
+  background: #ffffff;
+}
+
+
+.leave-modal-cancel,
+.leave-modal-confirm {
+  min-height: 44px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border-radius: 8px;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+
+.leave-modal-cancel {
+  border: 1px solid #dce1e8;
+
+  background: #f1f3f6;
+
+  color: #536176;
+}
+
+
+.leave-modal-cancel:hover {
+  background: #e7eaf0;
+
+  transform: translateY(-1px);
+}
+
+
+.leave-modal-confirm {
+  border: none;
+
+  color: #ffffff;
+}
+
+
+.confirm-approve {
+  background: #2563eb;
+}
+
+
+.confirm-approve:hover {
+  background: #1d4ed8;
+
+  box-shadow:
+    0 4px 12px rgba(37, 99, 235, 0.25);
+
+  transform: translateY(-1px);
+}
+
+
+.confirm-reject {
+  background: #dc3545;
+}
+
+
+.confirm-reject:hover {
+  background: #c82333;
+
+  box-shadow:
+    0 4px 12px rgba(220, 53, 69, 0.25);
+
+  transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+  .leave-modal-overlay {
+    padding: 12px;
+  }
+
+  .leave-confirm-modal {
+    max-height: calc(100vh - 24px);
+
+    border-radius: 12px;
+  }
+
+  .leave-modal-header {
+    padding: 16px;
+  }
+
+  .leave-modal-body {
+    padding: 16px;
+  }
+
+  .leave-modal-footer {
+    padding: 14px 16px 16px;
+  }
+
+  .leave-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .leave-modal-title-area h3 {
+    font-size: 17px;
+  }
+}
+
+/* ============================================================
+   CLICKABLE LEAVE STAT CARDS
+   ============================================================ */
+
+#manage-leaves .stat-card {
+  width: 100%;
+
+  border: 1px solid #e5eaf2;
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+
+#manage-leaves .stat-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 6px 18px rgba(25, 42, 70, 0.09);
+}
+
+
+/* Selected card */
+
+#manage-leaves .stat-card-active {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 0 0 3px rgba(79, 111, 240, 0.10),
+    0 6px 18px rgba(25, 42, 70, 0.08);
+}
+
+
+/* Selected Pending */
+
+#manage-leaves .stat-card.pending.stat-card-active {
+  border-color: #f2a900;
+}
+
+
+/* Selected Approved */
+
+#manage-leaves .stat-card.approved.stat-card-active {
+  border-color: #16b364;
+}
+
+
+/* Selected Rejected */
+
+#manage-leaves .stat-card.rejected.stat-card-active {
+  border-color: #ef4444;
+}
+
+
+/* Selected Total */
+
+#manage-leaves .stat-card.total.stat-card-active {
+  border-color: #5968f2;
+}
+
+
+/* Remove browser button outline */
+
+#manage-leaves .stat-card:focus {
+  outline: none;
+}
+
+
+/* Keyboard focus */
+
+#manage-leaves .stat-card:focus-visible {
+  outline: 2px solid #5968f2;
+
+  outline-offset: 2px;
+}
+/* ============================================================
+   LEAVE MODAL LOADING STATE
+   ============================================================ */
+
+.leave-modal-confirm:disabled,
+.leave-modal-cancel:disabled,
+.leave-modal-close:disabled {
+  cursor: not-allowed;
+}
+
+.leave-modal-confirm:disabled {
+  opacity: 0.75;
+  transform: none;
+  box-shadow: none;
+}
+
+.leave-modal-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.leave-modal-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.leave-remarks-form textarea:disabled {
+  background: #f5f6f8;
+  cursor: not-allowed;
 }

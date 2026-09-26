@@ -757,7 +757,35 @@ export default function UserDashboard(props) {
       .then((r) => r.json())
       .then((data) => {
         if (!data.success) throw new Error(data.message);
-        setAllLeavesData(data.leaves || []);
+        // User Leave History must contain only employee-visible fields.
+        // Admin remarks are intentionally excluded from the user-side history.
+        const userVisibleLeaves = (data.leaves || []).map((leave) => ({
+          id: leave.id,
+          leave_type: leave.leave_type,
+          start_date: leave.start_date,
+          end_date: leave.end_date,
+          total_days: leave.total_days,
+          holiday_days: leave.holiday_days,
+          used_paid_days: leave.used_paid_days,
+          used_comp_days: leave.used_comp_days,
+          used_unpaid_days: leave.used_unpaid_days,
+
+          // Employee's own reason
+          reason: leave.reason,
+
+          // Application date
+          created_at: leave.created_at,
+
+          // Admin action/status
+          status: leave.status,
+
+          // Date when admin approved/rejected
+          updated_at: leave.updated_at,
+
+          // Keep this out of the user UI
+          remarks: leave.remarks,
+        }));
+        setAllLeavesData(userVisibleLeaves);
         historyLoadedRef.current = true;
         setHistoryLoading(false);
       })
@@ -1016,6 +1044,17 @@ export default function UserDashboard(props) {
   // =========================================================================
   // Render
   // =========================================================================
+
+  // Wait until real dashboard data is loaded
+  if (dashboardLoading) {
+    return null;
+  }
+
+  // Don't show dummy dashboard if API failed
+  if (dashboardError || !dashboardData) {
+    return null;
+  }
+
   return (
     <div className="container-fluid">
       {/* ========== SIDEBAR ========== */}
@@ -2303,6 +2342,7 @@ export default function UserDashboard(props) {
                               <th>Unpaid</th>
                               <th>Reason</th>
                               <th>Applied On</th>
+                              <th>Remarks</th>
                               <th>Status</th>
                             </tr>
                           </thead>
@@ -2405,15 +2445,16 @@ export default function UserDashboard(props) {
                                     </td>
                                     <td
                                       style={{
-                                        maxWidth: 150,
+                                        maxWidth: 180,
                                         whiteSpace: "nowrap",
                                         overflow: "hidden",
                                         textOverflow: "ellipsis",
                                       }}
-                                      title={l.reason}
+                                      title={l.reason || "No reason provided"}
                                     >
-                                      {l.reason}
+                                      {l.reason || "—"}
                                     </td>
+
                                     <td
                                       style={{
                                         color: "#9ca3af",
@@ -2422,7 +2463,24 @@ export default function UserDashboard(props) {
                                     >
                                       {l.created_at}
                                     </td>
-                                    <td>
+
+                                    <td
+                                      style={{
+                                        maxWidth: 220,
+                                        whiteSpace: "nowrap",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        color: l.remarks
+                                          ? "#374151"
+                                          : "#9ca3af",
+                                        fontSize: ".85rem",
+                                      }}
+                                      title={l.remarks || "No admin remarks"}
+                                    >
+                                      {l.remarks || "—"}
+                                    </td>
+                                    
+                                    <td className="lhm-status-cell">
                                       <span
                                         style={{
                                           ...Object.fromEntries(
@@ -2440,12 +2498,27 @@ export default function UserDashboard(props) {
                                           fontWeight: 700,
                                           display: "inline-flex",
                                           alignItems: "center",
+                                          justifyContent: "center",
                                           gap: 5,
                                         }}
                                       >
                                         <i className={`fas fa-${ic}`} />
                                         {l.status}
                                       </span>
+
+                                      {/* APPROVED / REJECTED DATE */}
+                                      {l.status !== "Pending" &&
+                                        l.updated_at && (
+                                          <div className="lhm-status-date">
+                                            {new Date(
+                                              l.updated_at,
+                                            ).toLocaleDateString("en-GB", {
+                                              day: "2-digit",
+                                              month: "short",
+                                              year: "numeric",
+                                            })}
+                                          </div>
+                                        )}
                                     </td>
                                   </tr>
                                 );

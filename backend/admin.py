@@ -13,6 +13,7 @@ from io import BytesIO
 from datetime import datetime, timedelta
 import base64
 import logging
+import hashlib
 from dotenv import load_dotenv
 import json
 from utils import send_email
@@ -615,13 +616,36 @@ def admin_update_user(user_id):
                 return jsonify({"success": False, "message": "Position is required"})
             updates.append("position = %s")
             params.append(position)
-        if face_image:
+        if face_image and face_image.filename:
+            filename = face_image.filename.strip()
+            extension = os.path.splitext(filename)[1].lower()
+        
+            allowed_extensions = {
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".pdf",
+                ".doc",
+                ".docx"
+            }
+        
+            if extension not in allowed_extensions:
+                return jsonify({
+                    "success": False,
+                    "message": "Invalid file type. Only JPG, JPEG, PNG, PDF, DOC and DOCX files are allowed."
+                }), 400
+        
             face_image_data = face_image.read()
+        
             if not face_image_data:
-                return jsonify({"success": False, "message": "Invalid face image"})
+                return jsonify({
+                    "success": False,
+                    "message": "Uploaded file is empty."
+                }), 400
+        
             updates.append("face_image = %s")
             params.append(face_image_data)
-
+        
         params.append(user_id)
         query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
         cursor.execute(query, tuple(params))
@@ -639,33 +663,163 @@ def admin_update_user(user_id):
 
 @admin_bp.route('/upload_rota', methods=['POST'])
 def upload_rota():
+
     if not session.get('is_admin'):
-        return jsonify({"success": False, "message": "Access denied"})
+        return jsonify({
+            "success": False,
+            "message": "Access denied"
+        }), 403
 
     file = request.files.get('rota_image')
-    if not file:
-        return jsonify({"success": False, "message": "No file uploaded"})
 
-    rota_image_data = file.read()
-    if not rota_image_data:
-        return jsonify({"success": False, "message": "Invalid rota image"})
+    if not file or not file.filename:
+        return jsonify({
+            "success": False,
+            "message": "No rota file uploaded"
+        }), 400
+
+    filename = file.filename.strip()
+    extension = os.path.splitext(filename)[1].lower()
+
+    allowed_extensions = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".pdf",
+    ".csv",
+    ".docx"
+]
+
+    if extension not in allowed_extensions:
+        return jsonify({
+            "success": False,
+            "message": (
+                "Unsupported rota file. "
+                "Allowed formats: JPG, JPEG, PNG, PDF, CSV and DOCX."
+            )
+        }), 400
+
+    file_data = file.read()
+
+    if not file_data:
+        return jsonify({
+            "success": False,
+            "message": "Uploaded rota file is empty"
+        }), 400
+
+    # Create unique hash for duplicate detection
+    file_hash = hashlib.sha256(file_data).hexdigest()
 
     conn = get_db_connection()
+
     if not conn:
-        return jsonify({"success": False, "message": "Database error"})
+        return jsonify({
+            "success": False,
+            "message": "Database connection failed"
+        }), 500
 
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
+
     try:
-        cursor.execute("INSERT INTO rota (rota_image) VALUES (%s)", (rota_image_data,))
-        conn.commit()
-        return jsonify({"success": True, "message": "Rota uploaded successfully"})
-    except Exception as e:
-        return jsonify({"success": False, "message": f"Error: {str(e)}"})
-    finally:
-        if conn and conn.is_connected():
-            cursor.close()
-            conn.close()
 
+        # ---------------------------------------------
+        # DUPLICATE CHECK
+        # ---------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT id
+            FROM rota
+            WHERE rota_hash = %s
+            LIMIT 1
+            """,
+            (file_hash,)
+        )
+
+        duplicate = cursor.fetchone()
+
+        if duplicate:
+            return jsonify({
+                "success": False,
+                "message": "This rota file has already been uploaded."
+            }), 409
+
+        # ---------------------------------------------
+        # MIME TYPE
+        # ---------------------------------------------
+
+        mime_map = {
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".pdf": "application/pdf",
+            ".csv": "text/csv",
+            ".docx": (
+                "application/vnd.openxmlformats-officedocument."
+                "wordprocessingml.document"
+            )
+        }
+        
+        mime_type = mime_map.get(
+            extension,
+            "application/octet-stream"
+        )
+
+        # ---------------------------------------------
+        # SAVE
+        # ---------------------------------------------
+
+        cursor.execute(
+            """
+            INSERT INTO rota
+            (
+                rota_image,
+                rota_filename,
+                rota_mime_type,
+                rota_hash
+            )
+            VALUES (%s, %s, %s, %s)
+            """,
+            (
+                file_data,
+                filename,
+                mime_type,
+                file_hash
+            )
+        )
+
+        conn.commit()
+
+        # Return current file immediately
+        encoded = base64.b64encode(
+            file_data
+        ).decode("utf-8")
+
+        return jsonify({
+            "success": True,
+            "message": "Rota uploaded successfully",
+            "rota_image_base64": encoded,
+            "rota_filename": filename,
+            "rota_mime_type": mime_type
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        logging.exception(
+            "Rota upload error"
+        )
+
+        return jsonify({
+            "success": False,
+            "message": f"Error uploading rota: {str(e)}"
+        }), 500
+
+    finally:
+
+        cursor.close()
+        conn.close()
 
 @admin_bp.route('/upload_holiday', methods=['POST'])
 def upload_holiday():
@@ -1403,13 +1557,16 @@ def admin_api_data():
         notifications = cursor.fetchall()
 
 
-        # -------------------------------------------------
-        # ROTA
-        # -------------------------------------------------
+    # -------------------------------------------------
+    # ROTA
+    # -------------------------------------------------
 
         cursor.execute(
             """
-            SELECT rota_image
+            SELECT
+                rota_image,
+                rota_filename,
+                rota_mime_type
             FROM rota
             ORDER BY id DESC
             LIMIT 1
@@ -1419,13 +1576,24 @@ def admin_api_data():
         rota_row = cursor.fetchone()
 
         rota_image_base64 = None
+        rota_filename = None
+        rota_mime_type = None
 
-        if rota_row and rota_row.get('rota_image'):
+        if rota_row:
+        
+            rota_filename = rota_row.get(
+                "rota_filename"
+            )
 
-            rota_image_base64 = base64.b64encode(
-                rota_row['rota_image']
-            ).decode('utf-8')
+            rota_mime_type = rota_row.get(
+                "rota_mime_type"
+            )
 
+            if rota_row.get("rota_image"):
+            
+                rota_image_base64 = base64.b64encode(
+                    rota_row["rota_image"]
+                ).decode("utf-8")
 
         # -------------------------------------------------
         # HOLIDAY TABLE
@@ -1473,6 +1641,8 @@ def admin_api_data():
             "notifications": notifications,
 
             "rotaImage": rota_image_base64,
+            "rotaFilename": rota_filename,
+            "rotaMimeType": rota_mime_type,
 
             "holidayTable": holiday_table
         })

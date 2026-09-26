@@ -1,161 +1,514 @@
+/* =========================================================
+   EMPLOYEE TASK MANAGEMENT
+   ========================================================= */
+
 .admin-layout .admin-tasks-wrapper {
-    padding: 22px;
+  padding: 24px;
+  background: #ffffff;
 }
 
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 .admin-layout .admin-tasks-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
 }
 
 .admin-layout .admin-tasks-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #1f2937;
-    font-size: 20px;
-    font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #172033;
+  font-size: 22px;
+  font-weight: 700;
 }
 
+.admin-layout .admin-tasks-title i {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef5ff;
+  color: #2563eb;
+  border-radius: 12px;
+  font-size: 20px;
+}
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
 .admin-layout .admin-task-stats {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .admin-layout .admin-task-stat {
-    min-width: 80px;
-    padding: 9px 12px;
-    text-align: center;
-    background: #f8f9fa;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+  min-width: 105px;
+  padding: 12px 18px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-layout .admin-task-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.admin-layout .admin-task-stat.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
 }
 
 .admin-layout .admin-task-stat-val {
-    display: block;
-    font-size: 20px;
-    font-weight: 700;
-    color: #1f2937;
+  display: block;
+  font-size: 23px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #172033;
 }
 
 .admin-layout .admin-task-stat-label {
-    color: #6b7280;
-    font-size: 11px;
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
+/* Statistic colors */
+
+.admin-layout .admin-task-stat.at-approved .admin-task-stat-val {
+  color: #16a34a;
+}
+
+.admin-layout .admin-task-stat.at-pending .admin-task-stat-val {
+  color: #f59e0b;
+}
+
+.admin-layout .admin-task-stat.at-rejected .admin-task-stat-val {
+  color: #dc2626;
+}
+
+/* =========================================================
+   FILTER BAR
+   ========================================================= */
+
 .admin-layout .admin-task-filters {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5eaf0;
+  border-radius: 12px;
 }
 
 .admin-layout .task-search-box,
 .admin-layout .task-filter-box {
-    min-height: 42px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 12px;
-    background: #fff;
-    border: 1px solid #d9dee5;
-    border-radius: 7px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 13px;
+  background: #ffffff;
+  border: 1px solid #dbe2ea;
+  border-radius: 9px;
+  transition: all 0.2s ease;
 }
 
 .admin-layout .task-search-box {
-    flex: 1;
+  flex: 1;
+  min-width: 250px;
+}
+
+.admin-layout .task-filter-box {
+  width: 190px;
+}
+
+.admin-layout .task-search-box:focus-within,
+.admin-layout .task-filter-box:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.admin-layout .task-search-box i,
+.admin-layout .task-filter-box i {
+  color: #64748b;
+  font-size: 14px;
 }
 
 .admin-layout .task-search-box input,
 .admin-layout .task-filter-box select {
-    width: 100%;
-    border: 0;
-    outline: 0;
-    padding: 9px;
-    background: transparent;
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #1e293b;
+  font-size: 13px;
 }
+
+.admin-layout .task-search-box input::placeholder {
+  color: #94a3b8;
+}
+
+.admin-layout .task-filter-box select {
+  cursor: pointer;
+}
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
 
 .admin-layout .admin-tasks-table-wrap {
-    overflow-x: auto;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
 }
 
+.admin-layout .admin-tasks-table-wrap .table-responsive {
+  overflow-x: auto;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
 .admin-layout .admin-tasks-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .admin-layout .admin-tasks-table th {
-    padding: 12px;
-    background: #f8f9fa;
-    color: #6b7280;
-    font-size: 12px;
-    border-bottom: 1px solid #dee2e6;
+  padding: 14px 15px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .admin-layout .admin-tasks-table td {
-    padding: 12px;
-    border-bottom: 1px solid #edf0f2;
-    font-size: 13px;
+  padding: 15px;
+  color: #334155;
+  font-size: 13px;
+  vertical-align: middle;
+  border-bottom: 1px solid #edf1f5;
 }
 
+.admin-layout .admin-tasks-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.admin-layout .admin-tasks-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.admin-layout .admin-tasks-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* =========================================================
+   NUMBER
+   ========================================================= */
+
+.admin-layout .admin-tasks-table td:first-child {
+  width: 45px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* =========================================================
+   EMPLOYEE
+   ========================================================= */
+
 .admin-layout .at-emp-name {
-    font-weight: 600;
+  color: #172033;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .admin-layout .at-emp-id {
-    color: #9ca3af;
-    font-size: 12px;
+  margin-top: 4px;
+  color: #94a3b8;
+  font-size: 11px;
 }
 
-.admin-layout .at-project-tag,
-.admin-layout .at-time-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+/* =========================================================
+   PROJECT
+   ========================================================= */
+
+.admin-layout .at-project-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 150px;
+  padding: 6px 10px;
+  overflow: hidden;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
+
+.admin-layout .at-project-tag i {
+  font-size: 11px;
+}
+
+/* =========================================================
+   TASK
+   ========================================================= */
+
+.admin-layout .at-task-name {
+  display: block;
+  max-width: 220px;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+/* =========================================================
+   TIME PERIOD
+   ========================================================= */
+
+.admin-layout .at-time-chip {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 180px;
+  padding: 8px 10px;
+  color: #475569;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.admin-layout .at-time-chip i {
+  margin-top: 1px;
+  color: #64748b;
+}
+
+/* =========================================================
+   SUBMITTED
+   ========================================================= */
+
+.admin-layout .admin-tasks-table td:nth-child(6) {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
 
 .admin-layout .at-badge {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.admin-layout .at-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
 }
 
 .admin-layout .at-badge-approved {
-    background: #dcfce7;
-    color: #166534;
+  color: #15803d;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-layout .at-badge-approved::before {
+  background: #22c55e;
 }
 
 .admin-layout .at-badge-pending {
-    background: #fef3c7;
-    color: #92400e;
+  color: #a16207;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+}
+
+.admin-layout .at-badge-pending::before {
+  background: #f59e0b;
 }
 
 .admin-layout .at-badge-rejected {
-    background: #fee2e2;
-    color: #991b1b;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
 }
 
+.admin-layout .at-badge-rejected::before {
+  background: #ef4444;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
 .admin-layout .at-action-btns {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: nowrap;
 }
 
 .admin-layout .at-btn-approve,
 .admin-layout .at-btn-reject {
-    border: 0;
-    border-radius: 5px;
-    padding: 6px 10px;
-    color: #fff;
-    cursor: pointer;
+  min-width: 82px;
+  height: 34px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 7px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
 }
 
 .admin-layout .at-btn-approve {
-    background: #16a34a;
+  background: #16a34a;
 }
 
 .admin-layout .at-btn-reject {
-    background: #dc2626;
+  background: #dc2626;
+}
+
+.admin-layout .at-btn-approve:hover,
+.admin-layout .at-btn-reject:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+}
+
+.admin-layout .at-btn-approve:active,
+.admin-layout .at-btn-reject:active {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   DONE
+   ========================================================= */
+
+.admin-layout .at-done-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  color: #94a3b8;
+  background: #f8fafc;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.admin-layout .at-done-text::before {
+  content: "✓";
+  color: #16a34a;
+  font-weight: 700;
+}
+
+/* =========================================================
+   EMPTY TABLE
+   ========================================================= */
+
+.admin-layout .admin-tasks-table tbody tr:only-child td {
+  min-height: 50px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+  .admin-layout .admin-tasks-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-layout .admin-task-stats {
+    width: 100%;
+  }
+
+  .admin-layout .admin-task-stat {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-layout .admin-tasks-wrapper {
+    padding: 16px;
+  }
+
+  .admin-layout .admin-tasks-title {
+    font-size: 19px;
+  }
+
+  .admin-layout .admin-task-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-layout .task-search-box,
+  .admin-layout .task-filter-box {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-layout .admin-task-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-layout .admin-task-stat {
+    min-width: 0;
+  }
+
+  .admin-layout .admin-tasks-table {
+    min-width: 1000px;
+  }
 }

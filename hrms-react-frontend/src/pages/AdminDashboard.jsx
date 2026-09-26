@@ -29,277 +29,162 @@ import "../styles/admin/notifications.css";
 import "../styles/admin/modals.css";
 import "../styles/admin/responsive.css";
 
-
 function AdminDashboard() {
-
   // ============================================================
   // ACTIVE SECTION
   // ============================================================
 
-  const [
-    activeSection,
-    setActiveSection,
-  ] = useState("attendance");
-
+  const [activeSection, setActiveSection] = useState("attendance");
 
   // ============================================================
   // MOBILE SIDEBAR
   // ============================================================
 
-  const [
-    showSidebar,
-    setShowSidebar,
-  ] = useState(false);
-
+  const [showSidebar, setShowSidebar] = useState(false);
 
   // ============================================================
   // ADMIN PROFILE
   // ============================================================
 
-  const [
-    adminProfile,
-    setAdminProfile,
-  ] = useState(null);
-
+  const [adminProfile, setAdminProfile] = useState(null);
 
   // ============================================================
   // DASHBOARD DATA
   // ============================================================
 
-  const [
-    attendance,
-    setAttendance,
-  ] = useState([]);
+  const [attendance, setAttendance] = useState([]);
 
+  const [allAttendance, setAllAttendance] = useState([]);
 
-  const [
-    allAttendance,
-    setAllAttendance,
-  ] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
+  const [users, setUsers] = useState([]);
 
-  const [
-    tasks,
-    setTasks,
-  ] = useState([]);
+  const [leaves, setLeaves] = useState([]);
 
+  const [notifications, setNotifications] = useState([]);
 
-  const [
-    users,
-    setUsers,
-  ] = useState([]);
+  const [rotaImage, setRotaImage] = useState("");
+  const [rotaFilename, setRotaFilename] = useState("");
+  const [rotaMimeType, setRotaMimeType] = useState("");
 
-
-  const [
-    leaves,
-    setLeaves,
-  ] = useState([]);
-
-
-  const [
-    notifications,
-    setNotifications,
-  ] = useState([]);
-
-
-  const [
-    rotaImage,
-    setRotaImage,
-  ] = useState("");
-
-
-  const [
-    holidayTable,
-    setHolidayTable,
-  ] = useState("");
-
+  const [holidayTable, setHolidayTable] = useState("");
 
   // ============================================================
   // LOAD ADMIN DASHBOARD
   // ============================================================
 
   useEffect(() => {
-
     let cancelled = false;
 
     const loadAdminDashboard = async () => {
-
       try {
+        console.log("Loading admin dashboard...");
 
-        console.log(
-          "Loading admin dashboard..."
-        );
+        const data = await getAdminDashboard();
 
-
-        const data =
-          await getAdminDashboard();
-
-
-        console.log(
-          "Admin dashboard response:",
-          data
-        );
-
+        console.log("Admin dashboard response:", data);
 
         if (!data?.success) {
-
-          throw new Error(
-            data?.message ||
-            "Failed to load admin dashboard"
-          );
-
+          throw new Error(data?.message || "Failed to load admin dashboard");
         }
-
 
         if (cancelled) {
           return;
         }
-
 
         // ======================================================
         // ADMIN PROFILE
         // ======================================================
 
-        setAdminProfile(
-          data.adminProfile || null
-        );
-
+        setAdminProfile(data.adminProfile || null);
 
         // ======================================================
         // ATTENDANCE
         // ======================================================
 
-        setAttendance(
-          data.attendance || []
-        );
-
+        setAttendance(data.attendance || []);
 
         // ======================================================
         // ALL ATTENDANCE
         // ======================================================
 
-        setAllAttendance(
-          data.allAttendance ||
-          data.attendance ||
-          []
-        );
-
+        setAllAttendance(data.allAttendance || data.attendance || []);
 
         // ======================================================
         // TASKS
         // ======================================================
 
-        setTasks(
-          data.tasks || []
-        );
-
+        setTasks(data.tasks || []);
 
         // ======================================================
         // USERS
         // ======================================================
 
-        setUsers(
-          data.users || []
-        );
-
+        setUsers(data.users || []);
 
         // ======================================================
         // LEAVES
         // ======================================================
 
-        setLeaves(
-          data.leaves || []
-        );
-
+        setLeaves(data.leaves || []);
 
         // ======================================================
         // NOTIFICATIONS
         // ======================================================
 
-        setNotifications(
-          data.notifications || []
-        );
-
+        setNotifications(data.notifications || []);
 
         // ======================================================
         // ROTA
         // ======================================================
 
-        setRotaImage(
-          data.rotaImage || ""
-        );
-
+        setRotaImage(data.rotaImage || "");
+        setRotaFilename(data.rotaFilename || "");
+        setRotaMimeType(data.rotaMimeType || "");
 
         // ======================================================
         // HOLIDAY
         // ======================================================
 
-        setHolidayTable(
-          data.holidayTable || ""
-        );
+        setHolidayTable(data.holidayTable || "");
 
-
-        console.log(
-          "Admin dashboard data loaded successfully."
-        );
-
+        console.log("Admin dashboard data loaded successfully.");
       } catch (err) {
-
         if (cancelled) {
           return;
         }
 
-
-        console.error(
-          "Admin dashboard loading error:",
-          err
-        );
-
+        console.error("Admin dashboard loading error:", err);
       }
-
     };
 
-
     loadAdminDashboard();
-
 
     return () => {
       cancelled = true;
     };
-
   }, []);
-
 
   // ============================================================
   // SECTION CHANGE
   // ============================================================
 
   const handleSectionChange = (section) => {
-
-    console.log(
-      "Admin section:",
-      section
-    );
-
+    console.log("Admin section:", section);
 
     setActiveSection(section);
 
-
     // Close sidebar on mobile
     setShowSidebar(false);
-
   };
-
 
   // ============================================================
   // MAIN DASHBOARD
   // ============================================================
 
   return (
-
     <div className="admin-layout">
-
-
       {/* ======================================================
           SIDEBAR
       ======================================================= */}
@@ -312,147 +197,92 @@ function AdminDashboard() {
         adminProfile={adminProfile}
       />
 
-
       {/* ======================================================
           MAIN CONTENT
       ======================================================= */}
 
       <main className="main-content">
-
-
         {/* ====================================================
             HEADER
         ===================================================== */}
 
-        <AdminHeader
-          onMenuClick={() => setShowSidebar(true)}
-        />
-
+        <AdminHeader onMenuClick={() => setShowSidebar(true)} />
 
         {/* ====================================================
             ATTENDANCE
         ===================================================== */}
 
         {activeSection === "attendance" && (
-
-          <AttendanceModule
-            attendance={attendance}
-          />
-
+          <AttendanceModule attendance={attendance} />
         )}
-
 
         {/* ====================================================
             TASKS
         ===================================================== */}
 
-        {activeSection === "tasks" && (
-
-          <TasksModule
-            tasks={tasks}
-          />
-
-        )}
-
+        {activeSection === "tasks" && <TasksModule tasks={tasks} />}
 
         {/* ====================================================
             USERS
         ===================================================== */}
 
-        {activeSection === "users" && (
-
-          <UsersModule
-            users={users}
-          />
-
-        )}
-
+        {activeSection === "users" && <UsersModule users={users} />}
 
         {/* ====================================================
             ROTA
         ===================================================== */}
 
         {activeSection === "rota" && (
-
           <RotaModule
             rotaImage={rotaImage}
+            rotaFilename={rotaFilename}
+            rotaMimeType={rotaMimeType}
           />
-
         )}
-
 
         {/* ====================================================
             HOLIDAY
         ===================================================== */}
 
         {activeSection === "holiday" && (
-
-          <HolidayModule
-            holidayTable={holidayTable}
-          />
-
+          <HolidayModule holidayTable={holidayTable} />
         )}
-
 
         {/* ====================================================
             LEAVES
         ===================================================== */}
 
-        {activeSection === "manage-leaves" && (
-
-          <LeavesModule
-            leaves={leaves}
-          />
-
-        )}
-
+        {activeSection === "manage-leaves" && <LeavesModule leaves={leaves} />}
 
         {/* ====================================================
             NOTIFICATIONS
         ===================================================== */}
 
         {activeSection === "notifications" && (
-
-          <NotificationsModule
-            notifications={notifications}
-          />
-
+          <NotificationsModule notifications={notifications} />
         )}
-
 
         {/* ====================================================
             EXPORT
         ===================================================== */}
 
         {activeSection === "export" && (
-
-          <Export
-            onSectionChange={handleSectionChange}
-          />
-
+          <Export onSectionChange={handleSectionChange} />
         )}
-
 
         {/* ====================================================
             VIEW EXCEL
         ===================================================== */}
 
         {activeSection === "view-excel" && (
-
           <ViewExcel
             attendance={allAttendance}
             onSectionChange={handleSectionChange}
           />
-
         )}
-
       </main>
-
     </div>
-
   );
-
 }
-
 
 export default AdminDashboard;

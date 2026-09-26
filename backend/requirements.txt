@@ -21,3 +21,4 @@ gunicorn==21.2.0
 PyMySQL==1.1.0
 Werkzeug
 python-docx
+XlsxWriter

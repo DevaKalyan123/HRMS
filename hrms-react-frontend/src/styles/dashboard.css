@@ -613,7 +613,7 @@ body {
     flex: 1;
     border: none;
     background: transparent;
-    padding: 10px 10px 10px 0;
+    padding: 10px 10px 10px ;
     font-size: 0.86rem;
     color: #1f2937;
     font-family: inherit;
@@ -1629,4 +1629,50 @@ body {
     .toggle-btn {
         display: none !important;
     }
+}
+/* =========================================================
+   LEAVE HISTORY - STATUS DATE FINAL FIX
+   ========================================================= */
+
+#leaveHistoryModal .lhm-table th:last-child {
+    min-width: 130px !important;
+    width: 130px !important;
+    text-align: center !important;
+}
+
+#leaveHistoryModal .lhm-table td:last-child {
+    min-width: 130px !important;
+    width: 130px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* Status badge */
+#leaveHistoryModal .lhm-status-cell > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    white-space: nowrap !important;
+
+    margin: 0 auto !important;
+}
+
+/* Date below status */
+#leaveHistoryModal .lhm-status-date {
+    display: block !important;
+
+    margin-top: 5px !important;
+
+    width: 100% !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+    overflow: visible !important;
+
+    color: #8a96a8 !important;
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
 }

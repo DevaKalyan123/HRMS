@@ -378,7 +378,7 @@ def leave_history():
     try:
         cursor.execute("""
             SELECT id, leave_type, start_date, end_date, reason,
-                   total_days, holiday_days, used_paid_days, used_unpaid_days,used_comp_days, status,
+                   total_days, holiday_days, used_paid_days, used_unpaid_days,used_comp_days, status,remarks,
                    created_at
             FROM leaves
             WHERE user_id = %s
