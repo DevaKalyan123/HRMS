@@ -70,7 +70,7 @@ function EditUserModal({
 
               <input
                 type="file"
-                accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                accept=".jpg,.jpeg,.png,.pdf,"
                 onChange={handleFileChange}
               />
 

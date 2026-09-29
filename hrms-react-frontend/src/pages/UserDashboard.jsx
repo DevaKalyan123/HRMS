@@ -131,6 +131,8 @@ export default function UserDashboard(props) {
     latestHoliday: propLatestHoliday = null,
     tasks: propTasks = [],
     rotaImageBase64: propRotaImageBase64 = null,
+    rotaFilename: propRotaFilename = null,
+    rotaMimeType: propRotaMimeType = null,
     holidayTableHtml: propHolidayTableHtml = null,
     compensationLeaves: propCompensationLeaves = 0,
     paidLeaveBalance: propPaidLeaveBalance = 0,
@@ -176,6 +178,10 @@ export default function UserDashboard(props) {
   const tasks = dashboardData?.tasks ?? propTasks;
 
   const rotaImageBase64 = dashboardData?.rotaImageBase64 ?? propRotaImageBase64;
+
+  const rotaFilename = dashboardData?.rotaFilename ?? propRotaFilename;
+
+  const rotaMimeType = dashboardData?.rotaMimeType ?? propRotaMimeType;
 
   const holidayTableHtml =
     dashboardData?.holidayTableHtml ?? propHolidayTableHtml;
@@ -1779,19 +1785,165 @@ export default function UserDashboard(props) {
 
         {/* ── WEEKLY ROTA ── */}
         <section
-          className={`content-section ${activeSection === "weekly-rota" ? "active" : ""}`}
+          className={`content-section ${
+            activeSection === "weekly-rota" ? "active" : ""
+          }`}
           id="weekly-rota"
         >
           <div className="card">
-            <h3>Weekly Rota</h3>
+            <h3>
+              <i className="fas fa-calendar-week me-2" />
+              Weekly Rota
+            </h3>
+
             {rotaImageBase64 ? (
-              <img
-                src={`data:image/jpeg;base64,${rotaImageBase64}`}
-                alt="Weekly Rota"
-                className="rota-image img-fluid"
-              />
+              <div className="rota-file-container">
+                {/* ================================
+            IMAGE FILES
+        ================================= */}
+                {rotaMimeType?.startsWith("image/") && (
+                  <img
+                    src={`data:${rotaMimeType};base64,${rotaImageBase64}`}
+                    alt={rotaFilename || "Weekly Rota"}
+                    className="rota-image img-fluid"
+                  />
+                )}
+
+                {/* ================================
+            PDF FILE
+        ================================= */}
+                {rotaMimeType === "application/pdf" && (
+                  <div className="rota-document-card">
+                    <i className="fas fa-file-pdf rota-file-icon pdf-icon" />
+
+                    <h5>{rotaFilename || "Weekly Rota PDF"}</h5>
+
+                    <div className="rota-file-actions">
+                      <a
+                        href={`data:${rotaMimeType};base64,${rotaImageBase64}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary"
+                      >
+                        <i className="fas fa-eye me-2" />
+                        Open PDF
+                      </a>
+
+                      <a
+                        href={`data:${rotaMimeType};base64,${rotaImageBase64}`}
+                        download={rotaFilename || "weekly-rota.pdf"}
+                        className="btn btn-outline-primary"
+                      >
+                        <i className="fas fa-download me-2" />
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* ================================
+            WORD DOCUMENTS
+        ================================= */}
+                {(rotaMimeType === "application/msword" ||
+                  rotaMimeType ===
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document") && (
+                  <div className="rota-document-card">
+                    <i className="fas fa-file-word rota-file-icon word-icon" />
+
+                    <h5>{rotaFilename || "Weekly Rota Document"}</h5>
+
+                    <a
+                      href={`data:${rotaMimeType};base64,${rotaImageBase64}`}
+                      download={rotaFilename || "weekly-rota.docx"}
+                      className="btn btn-primary"
+                    >
+                      <i className="fas fa-download me-2" />
+                      Download Document
+                    </a>
+                  </div>
+                )}
+
+                {/* ================================
+            EXCEL FILES
+        ================================= */}
+                {(rotaMimeType === "application/vnd.ms-excel" ||
+                  rotaMimeType ===
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") && (
+                  <div className="rota-document-card">
+                    <i className="fas fa-file-excel rota-file-icon excel-icon" />
+
+                    <h5>{rotaFilename || "Weekly Rota Excel File"}</h5>
+
+                    <a
+                      href={`data:${rotaMimeType};base64,${rotaImageBase64}`}
+                      download={rotaFilename || "weekly-rota.xlsx"}
+                      className="btn btn-success"
+                    >
+                      <i className="fas fa-download me-2" />
+                      Download Excel
+                    </a>
+                  </div>
+                )}
+
+                {/* ================================
+    CSV FILE
+================================= */}
+                {rotaMimeType === "text/csv" && (
+                  <div className="rota-document-card">
+                    <i className="fas fa-file-csv rota-file-icon csv-icon" />
+
+                    <h5>{rotaFilename || "Weekly Rota CSV"}</h5>
+
+                    <a
+                      href={`data:${rotaMimeType};base64,${rotaImageBase64}`}
+                      download={rotaFilename || "weekly-rota.csv"}
+                      className="btn btn-primary"
+                    >
+                      <i className="fas fa-download me-2" />
+                      Download CSV
+                    </a>
+
+                    <iframe
+                      title="Weekly Rota CSV"
+                      src={`data:text/csv;base64,${rotaImageBase64}`}
+                      style={{
+                        width: "100%",
+                        height: "600px",
+                        marginTop: "20px",
+                        border: "1px solid #ddd",
+                        borderRadius: "8px",
+                        background: "#fff",
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* ================================
+            UNKNOWN FILE
+        ================================= */}
+                {!rotaMimeType && (
+                  <div className="rota-document-card">
+                    <i className="fas fa-file rota-file-icon" />
+
+                    <h5>{rotaFilename || "Weekly Rota File"}</h5>
+
+                    <a
+                      href={`data:application/octet-stream;base64,${rotaImageBase64}`}
+                      download={rotaFilename || "weekly-rota"}
+                      className="btn btn-primary"
+                    >
+                      <i className="fas fa-download me-2" />
+                      Download File
+                    </a>
+                  </div>
+                )}
+              </div>
             ) : (
-              <p className="text-muted">No weekly rota available.</p>
+              <div className="rota-empty">
+                <i className="fas fa-calendar-times" />
+                <p>No weekly rota available.</p>
+                <span>Check back later or contact HR.</span>
+              </div>
             )}
           </div>
         </section>
@@ -2479,7 +2631,7 @@ export default function UserDashboard(props) {
                                     >
                                       {l.remarks || "—"}
                                     </td>
-                                    
+
                                     <td className="lhm-status-cell">
                                       <span
                                         style={{

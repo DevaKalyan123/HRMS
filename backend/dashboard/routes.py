@@ -559,12 +559,16 @@ def api_dashboard():
         user_leaves = cursor.fetchall()
 
 
+        
         # ====================================================
-        # ROTA IMAGE
+        # ROTA FILE
         # ====================================================
 
         cursor.execute("""
-            SELECT rota_image
+            SELECT
+                rota_image,
+                rota_filename,
+                rota_mime_type
             FROM rota
             ORDER BY id DESC
             LIMIT 1
@@ -573,12 +577,24 @@ def api_dashboard():
         rota_row = cursor.fetchone()
 
         rota_image_base64 = None
+        rota_filename = None
+        rota_mime_type = None
 
-        if rota_row and rota_row.get('rota_image'):
+        if rota_row:
+        
+            rota_filename = rota_row.get('rota_filename')
+            rota_mime_type = rota_row.get('rota_mime_type')
 
-            rota_image_base64 = base64.b64encode(
-                rota_row['rota_image']
-            ).decode('utf-8')
+            if rota_row.get('rota_image'):
+                rota_image_base64 = base64.b64encode(
+                    rota_row['rota_image']
+                ).decode('utf-8')
+
+        print("========== ROTA DEBUG ==========")
+        print("Rota filename:", rota_filename)
+        print("Rota MIME type:", rota_mime_type)
+        print("Rota file exists:", bool(rota_image_base64))
+        print("================================")
 
 
         # ====================================================
@@ -790,7 +806,9 @@ def api_dashboard():
             "tasks": tasks,
 
             "rotaImageBase64": rota_image_base64,
-
+            "rotaFilename": rota_filename,
+            "rotaMimeType": rota_mime_type,
+            
             "holidayTableHtml": holiday_table,
 
             "compensationLeaves": compensation_leaves,

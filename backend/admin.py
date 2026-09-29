@@ -127,12 +127,35 @@ def admin():
         process_records(data)
         all_attendance = data
 
-        # ── Rota (image) ──────────────────────────────────────────────────
-        cursor.execute("SELECT rota_image FROM rota ORDER BY id DESC LIMIT 1")
+        
+        # ── Rota File ─────────────────────────────────────────────
+
+        cursor.execute("""
+            SELECT
+                rota_image,
+                rota_filename,
+                rota_mime_type
+            FROM rota
+            ORDER BY id DESC
+            LIMIT 1
+        """)
+
         rota_row = cursor.fetchone()
+
         rota_image_base64 = None
-        if rota_row and rota_row.get('rota_image'):
-            rota_image_base64 = base64.b64encode(rota_row['rota_image']).decode('utf-8')
+        rota_filename = None
+        rota_mime_type = None
+
+        if rota_row:
+        
+            rota_filename = rota_row.get("rota_filename")
+
+            rota_mime_type = rota_row.get("rota_mime_type")
+
+            if rota_row.get("rota_image"):
+                rota_image_base64 = base64.b64encode(
+                    rota_row["rota_image"]
+                ).decode("utf-8")
 
         # ── Holiday table (HTML string) ───────────────────────────────────
         cursor.execute("SELECT holiday_table FROM rota ORDER BY id DESC LIMIT 1")
@@ -180,6 +203,8 @@ def admin():
             tasks=tasks,
             search_query=search_query,
             rota_image_base64=rota_image_base64,
+            rota_filename=rota_filename,
+            rota_mime_type=rota_mime_type,
             holiday_table=holiday_table,
             read_notifications=read_notifications,
             leaves=leaves
@@ -625,14 +650,13 @@ def admin_update_user(user_id):
                 ".jpeg",
                 ".png",
                 ".pdf",
-                ".doc",
-                ".docx"
+                
             }
         
             if extension not in allowed_extensions:
                 return jsonify({
                     "success": False,
-                    "message": "Invalid file type. Only JPG, JPEG, PNG, PDF, DOC and DOCX files are allowed."
+                    "message": "Invalid file type. Only JPG, JPEG, PNG, PDF, files are allowed."
                 }), 400
         
             face_image_data = face_image.read()
@@ -681,23 +705,28 @@ def upload_rota():
     filename = file.filename.strip()
     extension = os.path.splitext(filename)[1].lower()
 
-    allowed_extensions = [
-    ".jpg",
-    ".jpeg",
-    ".png",
-    ".pdf",
-    ".csv",
-    ".docx"
-]
-
+    allowed_extensions = {
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".png": "image/png",
+      ".pdf": "application/pdf",
+      ".doc": "application/msword",
+      ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ".xls": "application/vnd.ms-excel",
+      ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ".csv": "text/csv"
+    }
+    
     if extension not in allowed_extensions:
         return jsonify({
             "success": False,
             "message": (
-                "Unsupported rota file. "
-                "Allowed formats: JPG, JPEG, PNG, PDF, CSV and DOCX."
+                "Invalid rota file. "
+                "Allowed formats: JPG, JPEG, PNG, PDF, DOC, DOCX, XLS, XLSX and CSV."
             )
         }), 400
+
+    
 
     file_data = file.read()
 
@@ -749,16 +778,28 @@ def upload_rota():
         # ---------------------------------------------
 
         mime_map = {
-            ".jpg": "image/jpeg",
-            ".jpeg": "image/jpeg",
-            ".png": "image/png",
-            ".pdf": "application/pdf",
-            ".csv": "text/csv",
-            ".docx": (
-                "application/vnd.openxmlformats-officedocument."
-                "wordprocessingml.document"
-            )
-        }
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+
+    ".pdf": "application/pdf",
+
+    ".doc": "application/msword",
+
+    ".docx": (
+        "application/vnd.openxmlformats-officedocument."
+        "wordprocessingml.document"
+    ),
+
+    ".xls": "application/vnd.ms-excel",
+
+    ".xlsx": (
+        "application/vnd.openxmlformats-officedocument."
+        "spreadsheetml.sheet"
+    ),
+
+    ".csv": "text/csv",
+}
         
         mime_type = mime_map.get(
             extension,

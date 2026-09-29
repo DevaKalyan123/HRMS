@@ -28,8 +28,7 @@ function EditAdminProfileModal({
       ".jpeg",
       ".png",
       ".pdf",
-      ".doc",
-      ".docx",
+      
     ];
 
     const fileName = file.name.toLowerCase();
@@ -41,7 +40,7 @@ function EditAdminProfileModal({
     // Check extension
     if (!allowedExtensions.includes(extension)) {
       alert(
-        "Invalid file type.\n\nOnly JPG, JPEG, PNG, PDF, DOC and DOCX files are allowed."
+        "Invalid file type.\n\nOnly JPG, JPEG, PNG, PDF files are allowed."
       );
 
       // Clear selected file
@@ -116,7 +115,7 @@ function EditAdminProfileModal({
                 id="admin-profile-file"
                 type="file"
                 className="form-control"
-                accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                accept=".jpg,.jpeg,.png,.pdf"
                 onChange={handleFileChange}
               />
 
