@@ -48,8 +48,8 @@ def get_db_connection():
         conn = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
             user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASSWORD", ""),
-            database=os.getenv("DB_NAME", "gps_face_db"),
+            password=os.getenv("DB_PASSWORD", "0103"),
+            database=os.getenv("DB_NAME", "hrms"),
             port=int(os.getenv("DB_PORT", 3306))
         )
         return conn

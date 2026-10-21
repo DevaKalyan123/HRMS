@@ -2,13 +2,11 @@ from flask import Blueprint, request, jsonify, session, send_file
 from utils import get_db_connection
 import io
 
-payslip_bp = Blueprint("payslip", __name__)
 
 
 # ----------------------------
 # Upload Payslip (called from Node.js)
 # ----------------------------
-@payslip_bp.route("/upload", methods=["POST"])
 def upload_payslip():
 
     email = request.form.get("email")
@@ -90,7 +88,6 @@ def upload_payslip():
 # ----------------------------
 # List Logged-in User Payslips
 # ----------------------------
-@payslip_bp.route("/list", methods=["GET"])
 def list_payslips():
 
     print("\n========== PAYSLIP SESSION DEBUG ==========")
@@ -140,7 +137,6 @@ def list_payslips():
 # ----------------------------
 # Download Payslip
 # ----------------------------
-@payslip_bp.route("/download/<int:payslip_id>", methods=["GET"])
 def download_payslip(payslip_id):
 
     if "user_id" not in session:
@@ -177,7 +173,6 @@ def download_payslip(payslip_id):
         download_name=f"{payslip['month']}_{payslip['year']}.pdf"
     )
 
-@payslip_bp.route("/view/<int:payslip_id>")
 def view_payslip(payslip_id):
 
     if "user_id" not in session:

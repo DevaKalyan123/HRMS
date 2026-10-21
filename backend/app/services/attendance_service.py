@@ -7,7 +7,6 @@ import io
 import datetime
 import time
 
-attendance_bp = Blueprint('attendance', __name__)
 
 # ── face_recognition import ─────────────────────────────
 try:
@@ -178,7 +177,6 @@ def _save_photo(np_img: np.ndarray, filename_stem: str):
         return None
 
 
-@attendance_bp.route('/diagnose_face', methods=['GET'])
 def diagnose_face():
     uid = request.args.get('user_id') or session.get('user_id')
     if not uid:
@@ -212,7 +210,6 @@ def diagnose_face():
 
 
 # mark_login and mark_logout routes (unchanged)
-@attendance_bp.route('/mark_login', methods=['POST'])
 def mark_login():
     user_id = session.get('user_id')
     if not user_id:
@@ -278,7 +275,6 @@ def mark_login():
         conn.close()
 
 
-@attendance_bp.route('/mark_logout', methods=['POST'])
 def mark_logout():
     # (Same as mark_login, just copy-paste from your original code)
     user_id = session.get('user_id')
@@ -348,7 +344,6 @@ def mark_logout():
         conn.close()
 
 
-@attendance_bp.route('/submit_daily_status', methods=['POST'])
 def submit_daily_status():
     user_id = session.get('user_id')
 

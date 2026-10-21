@@ -4,7 +4,6 @@ import logging
 from datetime import datetime, date
 import calendar
 
-leave_bp = Blueprint('leave', __name__)
 
 
 def get_working_days(start_date, end_date, conn):
@@ -144,7 +143,6 @@ def sync_monthly_carryforward(conn, user_id):
     return ensure_leave_balance(conn, user_id)
 
 
-@leave_bp.route('/apply_leave', methods=['POST'])
 def apply_leave():
     if 'user_id' not in session:
         return jsonify(success=False, message="Not logged in")
@@ -364,7 +362,6 @@ HR Administration Team
         conn.close()
 
 
-@leave_bp.route('/leave_history', methods=['GET'])
 def leave_history():
     """Return full leave history for the logged-in user as JSON."""
     if 'user_id' not in session:
@@ -400,7 +397,6 @@ def leave_history():
         cursor.close()
         conn.close()
 
-@leave_bp.route('/admin/update_leave_status/<int:leave_id>', methods=['POST'])
 def update_leave_status(leave_id):
 
     status = request.form.get('status')

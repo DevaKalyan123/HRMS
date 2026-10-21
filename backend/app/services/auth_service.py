@@ -43,10 +43,8 @@ def check_face(image_bytes):
 
     return "OK"
 
-auth_bp = Blueprint('auth', __name__)
 
 # LOGIN
-@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
@@ -106,7 +104,6 @@ def validate_password(password):
 
 
 # REGISTER
-@auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
 
     # Only admin can access register page
@@ -269,7 +266,6 @@ def register():
     })
 
 # LOGOUT
-@auth_bp.route('/logout')
 def logout():
     session.clear()
     return jsonify({
@@ -280,7 +276,6 @@ def logout():
 
 # FORGOT PASSWORD
 # FORGOT PASSWORD
-@auth_bp.route('/forgot_password', methods=['POST'])
 def forgot_password():
     email = request.form.get('email', '').strip()
 
@@ -395,7 +390,6 @@ HR System Security Team
             conn.close()
 
 # VERIFY OTP
-@auth_bp.route('/verify_otp', methods=['POST'])
 def verify_otp():
     otp = request.form.get('otp', '').strip()
 
@@ -426,7 +420,6 @@ def verify_otp():
     }), 400
 
 # RESET PASSWORD
-@auth_bp.route('/reset_password', methods=['POST'])
 def reset_password():
     if not session.get('otp_verified'):
         logging.error("OTP not verified")

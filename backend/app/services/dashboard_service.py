@@ -3,13 +3,11 @@ from utils import get_db_connection
 import base64
 from datetime import datetime, timedelta
 import pytz
-from leave.routes import sync_monthly_carryforward
+from app.services.leave_service import sync_monthly_carryforward
 import re   
 
 
-dashboard_bp = Blueprint('dashboard', __name__)
 
-@dashboard_bp.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
         return redirect('/auth/login')
@@ -210,7 +208,6 @@ def dashboard():
     )
 
 
-@dashboard_bp.route('/check_admin')
 def check_admin():
     user_id = session.get('user_id')
 
@@ -232,7 +229,6 @@ def check_admin():
         return {"is_admin": 0}
     
 
-@dashboard_bp.route('/add-task', methods=['POST'])
 def add_task():
 
     # Check login
@@ -373,7 +369,6 @@ def add_task():
 # REACT DASHBOARD API
 # ============================================================
 
-@dashboard_bp.route('/api/dashboard', methods=['GET'])
 def api_dashboard():
 
     print("\n========================================")

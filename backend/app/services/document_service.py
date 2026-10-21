@@ -2,9 +2,7 @@ from flask import Blueprint, request, jsonify, session
 import os
 from datetime import datetime
 
-document_bp = Blueprint('document', __name__)
 
-@document_bp.route('/upload', methods=['POST'])
 def upload():
     if 'user_id' not in session:
         return jsonify({"success": False, "message": "Not logged in"})
