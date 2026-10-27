@@ -98,7 +98,7 @@
 
    DB_NAME=gps_face_db
 
-   DB_PORT=3306
+   DB_PORT=3308
 
    MAIL_USERNAME=enter the email
 

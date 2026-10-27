@@ -27,7 +27,7 @@ db_config = {
     "user": os.environ.get("DB_USER", "root"),
     "password": os.environ.get("DB_PASSWORD", "0103"),
     "database": os.environ.get("DB_NAME", "gps_face_db"),
-    "port": int(os.environ.get("DB_PORT", 3306))
+    "port": int(os.environ.get("DB_PORT", 3308))
 }
 
 

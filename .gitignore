@@ -1,12 +1,24 @@
-.env
-backend/.env
 
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+venv/
+.venv/
 __pycache__/
 *.pyc
 
-venv/
+# React
+node_modules/
+dist/
+build/
 
-backend/static/uploads/attendance/
+# Database backups
+*.sql
+*.dump
+*.bak
 
-.vscode/
-__pycache__/
+# Logs
+*.log

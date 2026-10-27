@@ -1,39 +1,27 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://127.0.0.1:5000";
 
 export async function getPayslips() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/payslip/list`, {
-            method: "GET",
-            credentials: "include",
-            headers: {
-                Accept: "application/json",
-            },
-        });
+  const response = await fetch(`${API_BASE_URL}/payslip/list`, {
+    method: "GET",
+    credentials: "include",
+    headers: { Accept: "application/json" },
+  });
 
-        if (!response.ok) {
-            const text = await response.text();
-            console.error("Payslip API error:", response.status, text);
+  if (!response.ok) {
+    throw new Error(`Failed to load payslips: ${response.status}`);
+  }
 
-            throw new Error(
-                `Failed to load payslips. Status: ${response.status}`
-            );
-        }
-
-        const data = await response.json();
-
-        console.log("Payslip API response:", data);
-
-        return Array.isArray(data) ? data : [];
-    } catch (error) {
-        console.error("Error loading payslips:", error);
-        throw error;
-    }
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
 }
 
 export function getPayslipViewUrl(id) {
-    return `${API_BASE_URL}/payslip/view/${id}`;
+  return `${API_BASE_URL}/payslip/view/${id}`;
 }
 
 export function getPayslipDownloadUrl(id) {
-    return `${API_BASE_URL}/payslip/download/${id}`;
+  return `${API_BASE_URL}/payslip/download/${id}`;
 }
