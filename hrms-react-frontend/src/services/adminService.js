@@ -1,6 +1,7 @@
 // src/services/adminService.js
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5000";
+const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 /* ============================================================
    HELPER
@@ -224,15 +225,12 @@ export async function updateLeaveStatus(
 
             headers: {
                 "Content-Type":
-                    "application/x-www-form-urlencoded; charset=UTF-8",
-
-                "X-Requested-With":
-                    "XMLHttpRequest",
+                    "application/x-www-form-urlencoded; charset=UTF-8"
             },
 
             body: formData.toString(),
 
-            credentials: "include",
+            credentials: "include"
         }
     );
 
@@ -304,4 +302,125 @@ export async function rejectTask(taskId) {
     }
 
     return true;
+}
+
+export async function assignTask({
+    employee_id,
+    project_name,
+    task_name,
+    from_date,
+    to_date,
+}) {
+    const formData = new FormData();
+
+    formData.append("employee_id", employee_id);
+    formData.append("project_name", project_name);
+    formData.append("task_name", task_name);
+    formData.append("from_date", from_date);
+    formData.append("to_date", to_date);
+
+    const response = await fetch(
+        `${API_BASE_URL}/admin/assign-task`,
+        {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+        }
+    );
+
+    return handleResponse(response);
+}
+export function viewTaskDocument(taskId) {
+    const url = `${API_BASE_URL}/admin/task-document/${taskId}`;
+    window.open(url, "_blank");
+}
+/* ============================================================
+   EVENT MANAGEMENT
+   ============================================================ */
+
+// GET ALL EVENTS
+export async function getEvents() {
+    const response = await fetch(
+        `${API_BASE_URL}/events/`,
+        {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                Accept: "application/json",
+            },
+        }
+    );
+
+    return handleResponse(response);
+}
+
+
+// CREATE EVENT
+export async function createEvent(eventData) {
+    const response = await fetch(
+        `${API_BASE_URL}/events/`,
+        {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(eventData),
+        }
+    );
+
+    return handleResponse(response);
+}
+
+
+// UPDATE EVENT
+export async function updateEvent(eventId, eventData) {
+    const response = await fetch(
+        `${API_BASE_URL}/events/${eventId}`,
+        {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(eventData),
+        }
+    );
+
+    return handleResponse(response);
+}
+
+
+// DELETE EVENT
+export async function deleteEvent(eventId) {
+    const response = await fetch(
+        `${API_BASE_URL}/events/${eventId}`,
+        {
+            method: "DELETE",
+            credentials: "include",
+        }
+    );
+
+    return handleResponse(response);
+}
+
+
+// CHECK EVENT AVAILABILITY
+export async function checkEventAvailability(eventData) {
+    const response = await fetch(
+        `${API_BASE_URL}/events/check-availability`,
+        {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(eventData),
+        }
+    );
+
+    return handleResponse(response);
 }

@@ -337,29 +337,94 @@ body {
    MAILBOX
 ================================================================ */
 
-.mailbox-card { padding: 20px; }
-.mailbox-card h3 { display: flex; align-items: center; gap: 8px; font-size: 20px; color: #333; margin-bottom: 15px; }
+/* ================================================================
+   MAILBOX
+================================================================ */
 
-.mailbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
+.mailbox-card {
+    padding: 25px;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+}
+
+.mailbox-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 25px;
+}
+
+.mailbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 300px);
+    justify-content: center;
+    align-items: center;
+    gap: 45px;
+    padding: 15px;
+}
 
 .mail-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 120px;
+
+    width: 250px;
+    height: 165px;
+
     text-decoration: none;
-    border-radius: 10px;
+    border: 3px solid #ffffff;
+    outline: 1px solid #d1d5db;
+    border-radius: 18px;
+
     color: #fff;
     font-weight: 600;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-size: 16px;
+
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+    transition: all 0.3s ease;
 }
 
-.mail-item i { font-size: 36px; margin-bottom: 10px; }
-.mail-item:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-.gmail { background: linear-gradient(135deg, #ea4335, #c5221f); }
-.zoho { background: linear-gradient(135deg, #f0483e, #ff8a00); }
-.meet { background: linear-gradient(135deg, #1a73e8, #34a853); }
+.mail-item i {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.mail-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.20);
+}
+
+.mail-item.zoho {
+    background: linear-gradient(135deg, #f0483e, #ff8a00);
+}
+
+.mail-item.meet {
+    background: linear-gradient(135deg, #1a73e8, #34a853);
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .mailbox-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+        padding: 10px 0;
+    }
+
+    .mail-item {
+        width: 100%;
+        height: 125px;
+    }
+
+    .mail-item i {
+        font-size: 30px;
+    }
+}
 
 /* ================================================================
    HOLIDAY TABLE
@@ -1813,4 +1878,95 @@ body {
     .rota-file-btn {
         width: 100%;
     }
+}
+
+/* Daily Tasks - prevent task form from being cut off */
+.dt-wrapper,
+.dt-grid,
+.dt-history-card,
+.dt-task-list,
+.dt-task-item {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.dt-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    gap: 18px;
+}
+
+.dt-task-item {
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.dt-task-item textarea,
+.dt-task-item input[type="file"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.dt-task-item button {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+    .dt-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+.user-event-calendar {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.user-event-calendar .fc {
+  font-size: 14px;
+}
+
+.user-event-calendar .fc .fc-toolbar-title {
+  font-size: 21px;
+}
+
+.user-event-calendar .fc .fc-button-primary {
+  background: #24458f;
+  border-color: #24458f;
+}
+
+.user-event-calendar .fc-event {
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.user-event-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.user-event-modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.user-event-modal p {
+  margin-bottom: 12px;
 }

@@ -44,44 +44,76 @@ def check_face(image_bytes):
     return "OK"
 
 
+
 # LOGIN
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-        user = cursor.fetchone()
+        if not conn:
+            return jsonify({
+                "success": False,
+                "message": "Database connection failed"
+            }), 500
 
-        if user and check_password_hash(user['password'], password):
+        cursor = None
+
+        try:
+            cursor = conn.cursor(dictionary=True)
+
+            cursor.execute(
+                "SELECT * FROM users WHERE email = %s",
+                (email,)
+            )
+            user = cursor.fetchone()
+
+            if not user or not check_password_hash(user['password'], password):
+                return jsonify({
+                    "success": False,
+                    "message": "Invalid credentials"
+                }), 401
+
+            # Clear old session and create a fresh login session
+            session.clear()
+
+            is_admin = int(user.get('is_admin') or 0) == 1
+
             session['user_id'] = user['id']
             session['username'] = user['username']
-            session['is_admin'] = user['is_admin']
+            session['is_admin'] = is_admin
             session['email'] = user['email']
             session['position'] = user['position']
 
-            # ✅ Set modal flag only once on fresh login
-            if user['is_admin'] == 1:
+            if is_admin:
                 session['show_admin_modal'] = True
 
             return jsonify({
-    "success": True,
-    "message": "Login successful",
-    "is_admin": bool(user['is_admin'])
-})
-        else:
+                "success": True,
+                "message": "Login successful",
+                "user_id": user['id'],
+                "is_admin": is_admin
+            }), 200
+
+        except Exception as e:
+            logging.exception("Login error")
+
             return jsonify({
                 "success": False,
-                "message": "Invalid credentials"
-            })
+                "message": "Login failed. Please try again."
+            }), 500
+
+        finally:
+            if cursor:
+                cursor.close()
+            conn.close()
 
     return jsonify({
-    "success": True,
-    "message": "Login API is available"
-})
+        "success": True,
+        "message": "Login API is available"
+    }), 200
 
 
 def validate_password(password):

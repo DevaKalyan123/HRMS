@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 import pytz
 from app.services.leave_service import sync_monthly_carryforward
 import re   
-
+import os
+from werkzeug.utils import secure_filename
 
 
 def dashboard():
@@ -362,6 +363,156 @@ def add_task():
 
     finally:
 
+        cursor.close()
+        conn.close()
+
+def submit_task(task_id):
+    if 'user_id' not in session:
+        return {
+            "success": False,
+            "message": "Please log in first"
+        }, 401
+
+    description = (
+        request.form.get('completion_description') or ''
+    ).strip()
+    uploaded_file = request.files.get('document')
+
+    if not description:
+        return {
+            "success": False,
+            "message": "Completion description is required"
+        }, 400
+
+    if not uploaded_file or not uploaded_file.filename:
+        return {
+            "success": False,
+        "message": "Please upload a supporting document"
+        }, 400
+
+    allowed_extensions = {'pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'xlsx'}
+    original_filename = secure_filename(uploaded_file.filename)
+
+    if (
+        not original_filename
+        or '.' not in original_filename
+        or original_filename.rsplit('.', 1)[1].lower()
+        not in allowed_extensions
+    ):
+        return {
+            "success": False,
+            "message": "Unsupported document type"
+        }, 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    saved_path = None
+
+    try:
+        cursor.execute("""
+            SELECT id, status
+            FROM daily_tasks
+            WHERE id = %s AND employee_id = %s
+        """, (task_id, session['user_id']))
+
+        task = cursor.fetchone()
+
+        if not task:
+            return {
+                "success": False,
+                "message": "Task not found for this employee"
+            }, 404
+
+        if (task.get('status') or '').lower() != 'pending':
+            return {
+                "success": False,
+                "message": "Only pending tasks can be submitted"
+            }, 400
+
+        upload_folder = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            'uploads',
+            'task_documents'
+        )
+        os.makedirs(upload_folder, exist_ok=True)
+
+        filename = (
+            f"task_{task_id}_user_{session['user_id']}_"
+            f"{datetime.now().strftime('%Y%m%d%H%M%S%f')}_"
+            f"{original_filename}"
+        )
+        saved_path = os.path.join(upload_folder, filename)
+        uploaded_file.save(saved_path)
+
+        relative_path = os.path.relpath(
+            saved_path,
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        ).replace(os.sep, '/')
+
+        cursor.execute("""
+            UPDATE daily_tasks
+            SET completion_description = %s,
+                document_path = %s,
+                submitted_at = %s
+            WHERE id = %s
+              AND employee_id = %s
+              AND LOWER(COALESCE(status, 'pending')) = 'pending'
+        """, (
+            description,
+            relative_path,
+            datetime.now(),
+            task_id,
+            session['user_id']
+        ))
+
+        if cursor.rowcount != 1:
+            conn.rollback()
+            if saved_path and os.path.exists(saved_path):
+                os.remove(saved_path)
+            return {
+                "success": False,
+                "message": "Task could not be submitted. Please try again."
+            }, 409
+
+        cursor.execute("""
+            SELECT id
+            FROM users
+            WHERE is_admin = 1
+        """)
+        admins = cursor.fetchall()
+
+        for admin in admins:
+            cursor.execute("""
+                INSERT INTO notifications (message, user_id)
+                VALUES (%s, %s)
+            """, (
+                f"Employee {session['user_id']} submitted task #{task_id} for review.",
+                admin['id']
+            ))
+
+        conn.commit()
+
+        return {
+            "success": True,
+            "message": "Task submitted successfully for admin review"
+        }, 200
+
+    except Exception as e:
+        conn.rollback()
+
+        if saved_path and os.path.exists(saved_path):
+            try:
+                os.remove(saved_path)
+            except OSError:
+                pass
+
+        print("SUBMIT TASK ERROR:", str(e))
+        return {
+            "success": False,
+            "message": "Failed to submit task. Please try again."
+        }, 500
+
+    finally:
         cursor.close()
         conn.close()
 

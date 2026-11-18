@@ -16,6 +16,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
 import Payslips from "./Payslips";
 import "../styles/dashboard.css";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -101,6 +105,7 @@ function showToast(msg, type = "success") {
 // ---------------------------------------------------------------------------
 const SIDEBAR_ITEMS = [
   { id: "attendance", icon: "fas fa-clock", label: "Attendance" },
+  { id: "events", icon: "fas fa-calendar-check", label: "Upcoming Events" },
   { id: "daily-tasks", icon: "fas fa-tasks", label: "Daily Tasks" },
   { id: "weekly-rota", icon: "fas fa-calendar-week", label: "Weekly Rota" },
   { id: "holidays", icon: "fas fa-calendar-alt", label: "Holidays" },
@@ -146,6 +151,11 @@ export default function UserDashboard(props) {
   const [dashboardData, setDashboardData] = useState(null);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [dashboardError, setDashboardError] = useState("");
+  // Upcoming Events
+const [upcomingEvents, setUpcomingEvents] = useState([]);
+const [eventsLoading, setEventsLoading] = useState(true);
+const [eventsError, setEventsError] = useState("");
+const [selectedEvent, setSelectedEvent] = useState(null);
 
   const username = dashboardData?.username ?? propUsername;
 
@@ -255,6 +265,82 @@ export default function UserDashboard(props) {
       cancelled = true;
     };
   }, [API_BASE_URL]);
+  // ============================================================
+// LOAD UPCOMING EVENTS FOR EMPLOYEE
+// ============================================================
+
+useEffect(() => {
+  let cancelled = false;
+
+  const loadUpcomingEvents = async () => {
+    try {
+      setEventsLoading(true);
+      setEventsError("");
+
+      const response = await fetch(`${API_BASE_URL}/events/`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Unable to load events");
+      }
+
+      if (!cancelled) {
+        setUpcomingEvents(data.events || []);
+      }
+    } catch (error) {
+      if (!cancelled) {
+        setEventsError(error.message || "Unable to load events");
+      }
+    } finally {
+      if (!cancelled) {
+        setEventsLoading(false);
+      }
+    }
+  };
+
+  loadUpcomingEvents();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
+const userCalendarEvents = useMemo(() => {
+  return upcomingEvents
+    .filter((event) => event.event_date)
+    .map((event) => {
+      const eventDate = String(event.event_date).slice(0, 10);
+      const startTime = String(event.start_time || "00:00:00").slice(0, 8);
+      const endTime = String(event.end_time || "23:59:00").slice(0, 8);
+      const status = event.booking_status || "Booked";
+        return {
+        id: String(event.id),
+        title: event.event_name || "Restaurant Event",
+        start: `${eventDate}T${startTime}`,
+        end: `${eventDate}T${endTime}`,
+        backgroundColor:
+          status === "Cancelled" ? "#dc3545" : "#198754",
+        borderColor:
+          status === "Cancelled" ? "#dc3545" : "#198754",
+        extendedProps: {
+          eventName: event.event_name,
+          eventType: event.event_type,
+          eventDate,
+          startTime: startTime.slice(0, 5),
+          endTime: endTime.slice(0, 5),
+          guests: event.guests_count,
+          description: event.description,
+          status,
+        },
+      };
+    });
+}, [upcomingEvents]);
 
   // ---- Navigation state ----
   const [activeSection, setActiveSection] = useState(() => {
@@ -299,6 +385,7 @@ export default function UserDashboard(props) {
 
   // Daily tasks filter
   const [taskFilter, setTaskFilter] = useState("all");
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   // Calendar
   const [calYear, setCalYear] = useState(new Date().getFullYear());
@@ -545,100 +632,202 @@ export default function UserDashboard(props) {
       let eyeWasOpen = true;
       let livenessOk = false;
       let frameCount = 0;
+      let poseStage = "center";
+let centerFrames = 0;
+let leftFrames = 0;
+let rightFrames = 0;
+let returnCenterFrames = 0;
 
       faceMesh.onResults((results) => {
-        if (livenessOk) return;
-        frameCount++;
+  if (livenessOk) return;
 
-        if (frameCount === 5) {
-          setStatus(
-            isLogin,
-            "👤 Position your face in the centre of the camera…",
-            "info",
-          );
-        }
+  frameCount++;
 
-        const facesFound = results.multiFaceLandmarks
-          ? results.multiFaceLandmarks.length
-          : 0;
+  const facesFound = results.multiFaceLandmarks
+    ? results.multiFaceLandmarks.length
+    : 0;
 
-        if (facesFound === 0) {
-          if (frameCount > 5) {
-            setStatus(
-              isLogin,
-              "👤 No face detected. Look directly at the camera.",
-              "warn",
-            );
-          }
-          return;
-        }
+  if (facesFound === 0) {
+    setStatus(
+      isLogin,
+      "No face detected. Please look directly at the camera.",
+      "warn"
+    );
+    return;
+  }
 
-        if (facesFound > 1) {
-          setStatus(
-            isLogin,
-            "⚠️ Multiple faces detected! Only YOU should be in frame.",
-            "error",
-          );
-          blinkCount = 0;
-          closedFrames = 0;
-          eyeWasOpen = true;
-          return;
-        }
+  if (facesFound > 1) {
+    setStatus(
+      isLogin,
+      "Multiple faces detected. Only one person should be in the frame.",
+      "error"
+    );
 
-        const lm = results.multiFaceLandmarks[0];
-        if (!isFaceAcceptable(lm)) {
-          setStatus(
-            isLogin,
-            "🔍 Move closer to the camera and centre your face.",
-            "warn",
-          );
-          return;
-        }
+    blinkCount = 0;
+    closedFrames = 0;
+    eyeWasOpen = true;
+    poseStage = "center";
+    centerFrames = 0;
+    leftFrames = 0;
+    rightFrames = 0;
+    returnCenterFrames = 0;
+    return;
+  }
 
-        const avgEAR =
-          (eyeAspectRatio(lm, RIGHT_EYE) + eyeAspectRatio(lm, LEFT_EYE)) / 2.0;
+  const lm = results.multiFaceLandmarks[0];
 
-        if (avgEAR < EAR_THRESHOLD) {
-          closedFrames++;
-          eyeWasOpen = false;
-        } else {
-          if (closedFrames >= BLINK_CONSEC && !eyeWasOpen) {
-            blinkCount++;
-          }
-          closedFrames = 0;
-          eyeWasOpen = true;
-        }
+  if (!isFaceAcceptable(lm)) {
+    setStatus(
+      isLogin,
+      "Please center your face in the camera.",
+      "warn"
+    );
+    return;
+  }
 
-        const remaining = BLINKS_NEEDED - blinkCount;
-        if (remaining > 0) {
-          if (frameCount > 5) {
-            setStatus(
-              isLogin,
-              `👁 Blink ${remaining} more time${remaining > 1 ? "s" : ""}… (only your face should be visible)`,
-              "info",
-            );
-          }
-          return;
-        }
+  // Step 1: Blink verification
+  const avgEAR =
+    (eyeAspectRatio(lm, RIGHT_EYE) +
+      eyeAspectRatio(lm, LEFT_EYE)) / 2;
 
-        livenessOk = true;
-        if (animIdRef.current) cancelAnimationFrame(animIdRef.current);
+  if (avgEAR < EAR_THRESHOLD) {
+    closedFrames++;
+    eyeWasOpen = false;
+  } else {
+    if (closedFrames >= BLINK_CONSEC && !eyeWasOpen) {
+      blinkCount++;
+    }
 
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        canvas.getContext("2d").drawImage(video, 0, 0);
-        const imageDataUrl = canvas.toDataURL("image/jpeg", 0.85);
-        captureImageRef.current = imageDataUrl;
+    closedFrames = 0;
+    eyeWasOpen = true;
+  }
 
-        setStatus(
-          isLogin,
-          "✅ Liveness confirmed! Click the button below to submit.",
-          "success",
-        );
-        if (isLogin) setShowCaptureLogin(true);
-        else setShowCaptureLogout(true);
-      });
+  if (blinkCount < BLINKS_NEEDED) {
+    setStatus(
+      isLogin,
+      `Please blink ${BLINKS_NEEDED - blinkCount} more time(s).`,
+      "info"
+    );
+    return;
+  }
+
+  // Step 2: Estimate horizontal head movement
+  const cheekLeft = lm[234].x;
+  const cheekRight = lm[454].x;
+  const noseX = lm[1].x;
+
+  const faceWidth = Math.abs(cheekRight - cheekLeft);
+
+  if (faceWidth < 0.001) return;
+
+  const noseRatio =
+    (noseX - Math.min(cheekLeft, cheekRight)) / faceWidth;
+
+  const isCenter = noseRatio >= 0.43 && noseRatio <= 0.57;
+  const isTurnedOneSide = noseRatio < 0.38;
+  const isTurnedOtherSide = noseRatio > 0.62;
+
+  // Step 3: Require guided movement
+  if (poseStage === "center") {
+    if (isCenter) centerFrames++;
+    else centerFrames = 0;
+
+    setStatus(
+      isLogin,
+      "Step 1/4: Keep your face centered.",
+      "info"
+    );
+
+    if (centerFrames >= 5) {
+      poseStage = "left";
+      centerFrames = 0;
+    }
+
+    return;
+  }
+
+  if (poseStage === "left") {
+    setStatus(
+      isLogin,
+      "Step 2/4: Turn your head to one side.",
+      "info"
+    );
+
+    if (isTurnedOneSide) leftFrames++;
+    else leftFrames = 0;
+
+    if (leftFrames >= 5) {
+      poseStage = "right";
+      leftFrames = 0;
+    }
+
+    return;
+  }
+
+  if (poseStage === "right") {
+    setStatus(
+      isLogin,
+      "Step 3/4: Turn your head to the opposite side.",
+      "info"
+    );
+
+    if (isTurnedOtherSide) rightFrames++;
+    else rightFrames = 0;
+
+    if (rightFrames >= 5) {
+      poseStage = "returnCenter";
+      rightFrames = 0;
+    }
+
+    return;
+  }
+
+  if (poseStage === "returnCenter") {
+    setStatus(
+      isLogin,
+      "Step 4/4: Return your face to the center.",
+      "info"
+    );
+
+    if (isCenter) returnCenterFrames++;
+    else returnCenterFrames = 0;
+
+    if (returnCenterFrames < 5) return;
+
+    // All frontend checks passed; capture the frame
+    livenessOk = true;
+
+    if (animIdRef.current) {
+      cancelAnimationFrame(animIdRef.current);
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      livenessOk = false;
+      setStatus(isLogin, "Photo capture failed. Try again.", "error");
+      return;
+    }
+
+    ctx.drawImage(video, 0, 0);
+
+    const imageDataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    captureImageRef.current = imageDataUrl;
+
+    setStatus(
+      isLogin,
+      "Face verification completed. Please confirm and submit.",
+      "success"
+    );
+
+    if (isLogin) setShowCaptureLogin(true);
+    else setShowCaptureLogout(true);
+  }
+});
 
       const processFrame = async () => {
         if (!livenessOk && video.readyState >= 2 && !video.paused) {
@@ -1295,8 +1484,7 @@ export default function UserDashboard(props) {
                     )}
                   </div>
                   <small className="text-muted d-block mt-1">
-                    ℹ Please <strong>blink 2 times</strong> when prompted — this
-                    confirms you are a real person.
+                    ℹ Follow the on-screen instructions: blink twice, turn your head to both sides, and return to the center.
                   </small>
                 </>
               )}
@@ -1403,8 +1591,7 @@ export default function UserDashboard(props) {
                       )}
                     </div>
                     <small className="text-muted d-block mt-1">
-                      ℹ Please <strong>blink 2 times</strong> when prompted —
-                      this confirms you are a real person.
+                      ℹ Follow the on-screen instructions: blink twice, turn your head to both sides, and return to the center.
                     </small>
                   </>
                 )}
@@ -1521,8 +1708,8 @@ export default function UserDashboard(props) {
                   <i className="fas fa-tasks" />
                 </div>
                 <div>
-                  <h2>Daily Tasks</h2>
-                  <p>Log your work and track progress</p>
+                  <h2>My Assigned Tasks</h2>
+                  <p>Review tasks assigned by your admin and submit completed work</p>
                 </div>
               </div>
               <div className="dt-stats-mini">
@@ -1546,150 +1733,16 @@ export default function UserDashboard(props) {
             </div>
 
             <div className="dt-grid">
-              <div className="dt-form-col">
-                <div className="dt-form-card">
-                  <div className="dt-form-header">
-                    <i className="fas fa-plus-circle" />
-                    <span>Add New Task</span>
-                  </div>
-                  <form
-                    id="dt-add-form"
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-
-                      const form = e.currentTarget;
-                      const formData = new FormData(form);
-
-                      try {
-                        const response = await fetch(
-                          `${API_BASE_URL}/add-task`,
-                          {
-                            method: "POST",
-                            credentials: "include",
-                            body: formData,
-                          },
-                        );
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                          window.location.hash = "daily-tasks";
-                          window.location.reload();
-                        } else {
-                          alert(data.message || "Failed to add task");
-                        }
-                      } catch (error) {
-                        console.error("Add task error:", error);
-                        alert("Unable to add daily task");
-                      }
-                    }}
-                  >
-                    <div className="dt-field">
-                      <label className="dt-label">
-                        <i className="fas fa-folder" /> Project Name
-                      </label>
-                      <input
-                        type="text"
-                        name="project_name"
-                        className="dt-input"
-                        placeholder="Please enter project name"
-                        required
-                        autoComplete="off"
-                        pattern="[A-Za-z ]+"
-                        title="Only alphabets are allowed"
-                        onInput={(e) => {
-                          e.target.value = e.target.value.replace(
-                            /[^A-Za-z ]/g,
-                            "",
-                          );
-                        }}
-                      />
-                    </div>
-                    <div className="dt-field">
-                      <label className="dt-label">
-                        <i className="fas fa-clipboard-list" /> Task Name
-                      </label>
-                      <input
-                        type="text"
-                        name="task_name"
-                        className="dt-input"
-                        placeholder="Please enter task name"
-                        required
-                        autoComplete="off"
-                        pattern="[A-Za-z ]+"
-                        title="Only alphabets are allowed"
-                        onInput={(e) => {
-                          e.target.value = e.target.value.replace(
-                            /[^A-Za-z ]/g,
-                            "",
-                          );
-                        }}
-                      />
-                    </div>
-                    <div className="dt-field">
-                      <label className="dt-label">
-                        <i className="fas fa-calendar-alt" /> Time Period
-                      </label>
-                      <div className="dt-date-row">
-                        <div className="dt-date-box">
-                          <label className="dt-date-title">From Date</label>
-                          <div className="dt-date-wrap">
-                            <i className="fas fa-calendar-day dt-date-icon" />
-                            <input
-                              type="date"
-                              name="from_date"
-                              className="dt-date-input"
-                              min={todayStr}
-                              required
-                            />
-                          </div>
-                        </div>
-                        <div className="dt-date-box">
-                          <label className="dt-date-title">To Date</label>
-                          <div className="dt-date-wrap">
-                            <i className="fas fa-calendar-check dt-date-icon" />
-                            <input
-                              type="date"
-                              name="to_date"
-                              className="dt-date-input"
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <span className="dt-hint">
-                        This will be used for attendance tracking if rejected
-                      </span>
-                    </div>
-                    <button type="submit" className="dt-submit-btn">
-                      <i className="fas fa-paper-plane" /> Submit Task
-                    </button>
-                  </form>
-                </div>
-                <div className="dt-info-card">
-                  <i className="fas fa-info-circle" />
-                  <div>
-                    <strong>Note:</strong> If your task is rejected by admin,
-                    the time period you mentioned will be marked as{" "}
-                    <strong>Absent</strong> and you&apos;ll receive an email
-                    notification.
-                  </div>
-                </div>
-              </div>
-
-              <div className="dt-history-col">
+              <div className="dt-history-col" style={{ width: "100%" }}>
                 <div className="dt-history-card">
                   <div className="dt-history-header">
-                    <h5>
-                      <i className="fas fa-history" /> Task History
-                    </h5>
+                    <h5><i className="fas fa-history" /> Assigned Task History</h5>
                     <div className="dt-filter-tabs">
                       {["all", "Pending", "Approved", "Rejected"].map((f) => (
                         <button
                           key={f}
                           type="button"
                           className={`dt-filter-btn ${taskFilter === f ? "active" : ""}`}
-                          data-filter={f}
                           onClick={() => setTaskFilter(f)}
                         >
                           {f === "all" ? "All" : f}
@@ -1697,86 +1750,168 @@ export default function UserDashboard(props) {
                       ))}
                     </div>
                   </div>
+
                   <div className="dt-task-list" id="dt-task-list">
                     {filteredTasks.length > 0 ? (
-                      filteredTasks.map((task, idx) => (
-                        <div
-                          key={task.id || idx}
-                          className="dt-task-item"
-                          data-status={task.status}
-                        >
-                          <div className="dt-task-left">
-                            <div
-                              className={`dt-task-icon ${
-                                task.status === "Approved"
-                                  ? "dt-icon-approved"
-                                  : task.status === "Rejected"
-                                    ? "dt-icon-rejected"
-                                    : "dt-icon-pending"
-                              }`}
+                      filteredTasks.map((task, idx) => {
+                        const normalizedStatus = String(task.status || "Pending").toLowerCase();
+                        const isPending = normalizedStatus === "pending";
+                        const isSelected = selectedTaskId === task.id;
+
+                        return (
+                          <div
+                            key={task.id || idx}
+                            className="dt-task-item"
+                            data-status={task.status || "Pending"}
+                          >
+                            <button
+                              type="button"
+                              className="dt-task-left"
+                              onClick={() => setSelectedTaskId(isSelected ? null : task.id)}
+                              aria-expanded={isSelected}
+                              style={{
+                                border: 0,
+                                background: "transparent",
+                                textAlign: "left",
+                                cursor: "pointer",
+                                flex: 1,
+                                minWidth: 0,
+                              }}
                             >
-                              <i
-                                className={`fas fa-${
-                                  task.status === "Approved"
-                                    ? "check"
-                                    : task.status === "Rejected"
-                                      ? "times"
-                                      : "clock"
-                                }`}
-                              />
-                            </div>
-                            <div className="dt-task-info">
-                              <div className="dt-task-name">
-                                {task.task_name}
+                              <div className={`dt-task-icon ${normalizedStatus === "approved" ? "dt-icon-approved" : normalizedStatus === "rejected" ? "dt-icon-rejected" : "dt-icon-pending"}`}>
+                                <i className={`fas fa-${normalizedStatus === "approved" ? "check" : normalizedStatus === "rejected" ? "times" : "clock"}`} />
                               </div>
-                              <div className="dt-task-project">
-                                <i className="fas fa-folder-open" />{" "}
-                                {task.project_name}
+                              <div className="dt-task-info">
+                                <div className="dt-task-name">{task.task_name || "Untitled task"}</div>
+                                <div className="dt-task-project">
+                                  <i className="fas fa-folder-open" /> {task.project_name || "No project"}
+                                </div>
                               </div>
-                            </div>
-                          </div>
-                          <div className="dt-task-right">
-                            <div className="dt-task-meta">
-                              <span className="dt-time-chip">
-                                <i className="fas fa-hourglass-half" />{" "}
-                                {task.time_period || "N/A"}
-                              </span>
-                              <span className="dt-task-date">
-                                {task.created_at
-                                  ? new Date(
-                                      task.created_at,
-                                    ).toLocaleDateString("en-GB", {
-                                      day: "2-digit",
-                                      month: "short",
-                                      year: "numeric",
-                                    })
-                                  : ""}
+                            </button>
+
+                            <div className="dt-task-right">
+                              <div className="dt-task-meta">
+                                <span className="dt-time-chip">
+                                  <i className="fas fa-hourglass-half" /> {task.time_period || "N/A"}
+                                </span>
+                                <span className="dt-task-date">
+                                  {task.created_at
+                                    ? new Date(task.created_at).toLocaleDateString("en-GB", {
+                                        day: "2-digit", month: "short", year: "numeric",
+                                      })
+                                    : ""}
+                                </span>
+                              </div>
+                              <span className={`dt-status-badge ${normalizedStatus === "approved" ? "dt-badge-approved" : normalizedStatus === "rejected" ? "dt-badge-rejected" : "dt-badge-pending"}`}>
+                                {task.status || "Pending"}
                               </span>
                             </div>
-                            <span
-                              className={`dt-status-badge ${
-                                task.status === "Approved"
-                                  ? "dt-badge-approved"
-                                  : task.status === "Rejected"
-                                    ? "dt-badge-rejected"
-                                    : "dt-badge-pending"
-                              }`}
-                            >
-                              {task.status}
-                            </span>
+
+                            {isSelected && (
+                              <div
+                                className="dt-task-submit-form"
+                                style={{ width: "100%", padding: "16px", marginTop: "14px", background: "#f8fafc", borderRadius: "10px" }}
+                              >
+                                {task.completion_description && (
+                                  <p><strong>Your submitted description:</strong> {task.completion_description}</p>
+                                )}
+                                {task.document_path && (
+                                  <p><strong>Uploaded document:</strong> {String(task.document_path).split(/[\\/]/).pop()}</p>
+                                )}
+
+                                {isPending ? (
+                                  <form
+                                    onSubmit={async (e) => {
+                                      e.preventDefault();
+                                      const form = e.currentTarget;
+                                      const description = String(new FormData(form).get("completion_description") || "").trim();
+                                      const fileInput = form.elements.namedItem("document");
+                                      const file = fileInput?.files?.[0];
+
+                                      if (!description) {
+                                        alert("Please enter a completion description.");
+                                        return;
+                                      }
+                                      if (!file) {
+                                        alert("Please select a supporting document.");
+                                        return;
+                                      }
+                                      if (file.size > 10 * 1024 * 1024) {
+                                        alert("File size must be 10 MB or less.");
+                                        return;
+                                      }
+
+                                      const formData = new FormData(form);
+                                      try {
+                                        const response = await fetch(`${API_BASE_URL}/submit-task/${task.id}`, {
+                                          method: "POST",
+                                          credentials: "include",
+                                          body: formData,
+                                        });
+                                        const data = await response.json().catch(() => ({}));
+                                        if (!response.ok || !data.success) {
+                                          alert(data.message || `Task submission failed (HTTP ${response.status}).`);
+                                          return;
+                                        }
+                                        alert(data.message || "Task submitted successfully for admin review.");
+                                        window.location.hash = "daily-tasks";
+                                        window.location.reload();
+                                      } catch (error) {
+                                        console.error("Task submission error:", error);
+                                        alert("Unable to submit task. Please check the connection and try again.");
+                                      }
+                                    }}
+                                  >
+                                    <div className="dt-field">
+                                      <label className="dt-label" htmlFor={`completion-description-${task.id}`}>Completion Description</label>
+                                      <textarea
+                                        id={`completion-description-${task.id}`}
+                                        name="completion_description"
+                                        className="dt-input"
+                                        placeholder="Describe the work you completed"
+                                        rows={4}
+                                        required
+                                        defaultValue={task.completion_description || ""}
+                                        style={{ width: "100%", marginBottom: "12px" }}
+                                      />
+                                    </div>
+                                    <div className="dt-field">
+                                      <label className="dt-label" htmlFor={`task-document-${task.id}`}>Supporting Document</label>
+                                      <input
+                                        id={`task-document-${task.id}`}
+                                        type="file"
+                                        name="document"
+                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xlsx,.xls,.txt"
+                                        required={!task.document_path}
+                                        className="dt-input"
+                                        style={{ display: "block", width: "100%", margin: "8px 0 16px" }}
+                                      />
+                                      <small className="text-muted">Allowed: PDF, Word, Excel, TXT, JPG, PNG. Maximum 10 MB.</small>
+                                    </div>
+                                    <button type="submit" className="dt-submit-btn">
+                                      <i className="fas fa-paper-plane" /> Submit for Admin Review
+                                    </button>
+                                  </form>
+                                ) : (
+                                  <p className="text-muted">This task is {task.status || "Pending"}. Submission is available only while the task is pending.</p>
+                                )}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <div className="dt-empty">
-                        <div className="dt-empty-icon">
-                          <i className="fas fa-clipboard" />
-                        </div>
-                        <p>No tasks submitted yet</p>
-                        <span>Add your first task using the form</span>
+                        <div className="dt-empty-icon"><i className="fas fa-clipboard" /></div>
+                        <p>No assigned tasks found</p>
+                        <span>Your admin-assigned tasks will appear here.</span>
                       </div>
                     )}
                   </div>
+                </div>
+                <div className="dt-info-card" style={{ marginTop: "16px" }}>
+                  <i className="fas fa-info-circle" />
+                  <div>Only your admin can assign tasks. Open a pending task to enter your completion description and upload a supporting document. Rejected tasks continue to follow the existing attendance and email rules.</div>
                 </div>
               </div>
             </div>
@@ -2039,7 +2174,7 @@ export default function UserDashboard(props) {
               <i className="fa-solid fa-envelope" /> My Mailbox
             </h3>
             <div className="mailbox-grid">
-              <a
+              {/* <a
                 href="https://mail.google.com/"
                 target="_blank"
                 rel="noreferrer"
@@ -2048,7 +2183,7 @@ export default function UserDashboard(props) {
               >
                 <i className="fa-brands fa-google" />
                 <span>Open Gmail</span>
-              </a>
+              </a> */}
               <a
                 href="https://mail.zoho.com/"
                 target="_blank"
@@ -2059,7 +2194,7 @@ export default function UserDashboard(props) {
                 <i className="fa-solid fa-envelope-open-text" />
                 <span>Open Zoho Mail</span>
               </a>
-              <a
+              {/* <a
                 href="https://meet.google.com/"
                 target="_blank"
                 rel="noreferrer"
@@ -2068,7 +2203,18 @@ export default function UserDashboard(props) {
               >
                 <i className="fa-solid fa-video" />
                 <span>Google Meet</span>
-              </a>
+              </a> */}
+              <a
+  href="https://meet.google.com/meet/toa-wfnj-vni"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="mail-item meet"
+  //  style={{ margin: 0, padding: "12px 8px" }}
+  aria-label="Open Google Meet"
+>
+  <i className="fa-solid fa-video" />
+  <span>Google Meet</span>
+</a>
             </div>
           </div>
         </section>
@@ -2686,6 +2832,138 @@ export default function UserDashboard(props) {
             </div>
           </div>
         )}
+{/* ── UPCOMING EVENTS CALENDAR ── */}
+<section
+  className={`content-section ${
+    activeSection === "events" ? "active" : ""
+  }`}
+  id="events"
+>
+  <div className="card">
+    <h3>
+      <i className="fas fa-calendar-check me-2" />
+      Upcoming Events Calendar
+    </h3>
+
+    <p className="text-muted">
+      View restaurant events scheduled by the admin.
+    </p>
+
+    <div className="d-flex gap-3 mb-3 flex-wrap">
+      <span>
+        <span style={{ color: "#198754" }}>●</span> Booked
+      </span>
+      <span>
+        <span style={{ color: "#dc3545" }}>●</span> Cancelled
+      </span>
+    </div>
+
+    {eventsLoading ? (
+      <p className="text-muted p-3">Loading events...</p>
+    ) : eventsError ? (
+      <div className="alert alert-danger">{eventsError}</div>
+    ) : userCalendarEvents.length > 0 ? (
+      <div className="user-event-calendar">
+        <FullCalendar
+          plugins={[
+            dayGridPlugin,
+            timeGridPlugin,
+            interactionPlugin,
+          ]}
+          initialView="dayGridMonth"
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          buttonText={{
+            today: "Today",
+            month: "Month",
+            week: "Week",
+            day: "Day",
+          }}
+          events={userCalendarEvents}
+          eventClick={(info) => {
+            setSelectedEvent({
+              ...info.event.extendedProps,
+            });
+          }}
+          height="auto"
+          dayMaxEvents={3}
+          nowIndicator={true}
+          eventTimeFormat={{
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }}
+        />
+      </div>
+    ) : (
+      <p className="text-muted p-3">
+        No upcoming events available.
+      </p>
+    )}
+  </div>
+
+  {/* EVENT DETAILS POPUP */}
+  {selectedEvent && (
+    <div
+      className="user-event-modal-overlay"
+      onClick={() => setSelectedEvent(null)}
+    >
+      <div
+        className="user-event-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h4>Event Details</h4>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setSelectedEvent(null)}
+          />
+        </div>
+
+        <p>
+          <strong>Event Name:</strong>{" "}
+          {selectedEvent.eventName}
+        </p>
+        <p>
+          <strong>Event Type:</strong>{" "}
+          {selectedEvent.eventType || "N/A"}
+        </p>
+        <p>
+          <strong>Date:</strong>{" "}
+          {selectedEvent.eventDate}
+        </p>
+        <p>
+          <strong>Time:</strong>{" "}
+          {selectedEvent.startTime} - {selectedEvent.endTime}
+        </p>
+        <p>
+          <strong>Guests:</strong>{" "}
+          {selectedEvent.guests ?? 0}
+        </p>
+        <p>
+          <strong>Status:</strong>{" "}
+          {selectedEvent.status}
+        </p>
+        <p>
+          <strong>Description:</strong>{" "}
+          {selectedEvent.description || "No description"}
+        </p>
+
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => setSelectedEvent(null)}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  )}
+</section>
 
         {/* ── NOTIFICATIONS ── */}
         <section

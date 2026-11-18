@@ -14,6 +14,9 @@ def check_admin():
 @dashboard_bp.route('/add-task', methods=['POST'])
 def add_task():
     return DashboardController.add_task()
+@dashboard_bp.route('/submit-task/<int:task_id>', methods=['POST'])
+def submit_task(task_id):
+    return DashboardController.submit_task(task_id)
 
 @dashboard_bp.route('/api/dashboard', methods=['GET'])
 def api_dashboard():

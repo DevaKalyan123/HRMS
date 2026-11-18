@@ -431,7 +431,39 @@ function AdminSidebar({
 
             </li>
 
+            {/* EVENT MANAGEMENT */}
 
+<li
+  className={
+    activeSection === "events" ? "active" : ""
+  }
+>
+  <button
+    type="button"
+    className="sidebar-link-button"
+    onClick={() => handleNavigation("events")}
+  >
+    <i className="fas fa-calendar-alt" />
+
+    <span>Event Management</span>
+  </button>
+</li>
+{/* EVENT CALENDAR */}
+
+<li
+  className={
+    activeSection === "event-calendar" ? "active" : ""
+  }
+>
+  <button
+    type="button"
+    className="sidebar-link-button"
+    onClick={() => handleNavigation("event-calendar")}
+  >
+    <i className="fas fa-calendar-alt" />
+    <span>Event Calendar</span>
+  </button>
+</li>
             {/* TASKS */}
 
             <li

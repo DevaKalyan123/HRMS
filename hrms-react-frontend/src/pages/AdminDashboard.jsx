@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
+import EventCalendar from "../components/admin/EventCalendar";
+
 
 import AttendanceModule from "../components/admin/AttendanceModule";
 import TasksModule from "../components/admin/TasksModule";
@@ -15,6 +17,7 @@ import Export from "../components/admin/Export";
 import ViewExcel from "../components/admin/ViewExcel";
 
 import { getAdminDashboard } from "../services/adminService";
+import EventManagement from "../components/admin/EventManagement";
 
 import "../styles/admin/admin-layout.css";
 import "../styles/admin/admin-sidebar.css";
@@ -28,7 +31,8 @@ import "../styles/admin/leaves.css";
 import "../styles/admin/notifications.css";
 import "../styles/admin/modals.css";
 import "../styles/admin/responsive.css";
-
+import "../styles/admin/event-management.css";
+import "../styles/admin/event-calendar.css";
 function AdminDashboard() {
   // ============================================================
   // ACTIVE SECTION
@@ -215,12 +219,24 @@ function AdminDashboard() {
         {activeSection === "attendance" && (
           <AttendanceModule attendance={attendance} />
         )}
+        {/* ====================================================
+    EVENT CALENDAR
+===================================================== */}
 
+{activeSection === "event-calendar" && <EventCalendar />}
+
+{/* ====================================================
+    EVENT MANAGEMENT
+===================================================== */}
+
+{activeSection === "events" && <EventManagement />}
         {/* ====================================================
             TASKS
         ===================================================== */}
 
-        {activeSection === "tasks" && <TasksModule tasks={tasks} />}
+       {activeSection === "tasks" && (
+  <TasksModule tasks={tasks} users={users} />
+)}
 
         {/* ====================================================
             USERS

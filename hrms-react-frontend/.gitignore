@@ -22,3 +22,22 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python generated files
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Employee data and uploaded documents
+backend/uploads/
+backend/static/uploads/
+
+# Generated project structure files
+backend/full_project_structure.txt
+full_project_structure.txt
+hrms-react-frontend/frontend_structure.txt

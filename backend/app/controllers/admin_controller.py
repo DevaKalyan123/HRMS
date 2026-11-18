@@ -4,7 +4,9 @@ class AdminController:
     @staticmethod
     def admin():
         return admin_service.admin()
-
+    @staticmethod
+    def assign_task():
+        return admin_service.assign_task()
     @staticmethod
     def admin_leaves():
         return admin_service.admin_leaves()
@@ -72,4 +74,7 @@ class AdminController:
     @staticmethod
     def admin_api_data():
         return admin_service.admin_api_data()
+    @staticmethod
+    def view_task_document(task_id):
+        return admin_service.view_task_document(task_id)
 

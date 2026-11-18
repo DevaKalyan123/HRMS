@@ -12,24 +12,51 @@ from app.routes.dashboard_routes import dashboard_bp
 from app.routes.admin_routes import admin_bp
 from app.routes.birthday_routes import birthday_bp
 from app.routes.payslip_routes import payslip_bp
+from app.routes.event_routes import event_bp
+from app.routes.biometric_routes import biometric_bp
 
 def create_app():
     load_dotenv()
     app = Flask(__name__)
     app.config.from_object(Config)
-    CORS(app, origins=[
-        "https://cbz6k2gf-5173.inc1.devtunnels.ms",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173"
-    ], supports_credentials=True)
+    CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": [
+                "https://jhbmv8ff-5173.inc1.devtunnels.ms",
+                "http://localhost:5173",
+                "http://127.0.0.1:5173"
+            ],
+            "allow_headers": [
+                "Content-Type",
+"Authorization",
+"X-Requested-With",
+"Accept",
+"X-Biometric-Token"
+            ],
+            "methods": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
+            ]
+        }
+    },
+    supports_credentials=True
+)
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(leave_bp, url_prefix="/leave")
     app.register_blueprint(document_bp, url_prefix="/document")
     app.register_blueprint(attendance_bp)
+    app.register_blueprint(biometric_bp, url_prefix="/biometric")
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(birthday_bp)
     app.register_blueprint(payslip_bp, url_prefix="/payslip")
+    app.register_blueprint(event_bp, url_prefix="/events")
     @app.route("/")
     def home():
         return jsonify({"message": "HRMS Backend API is running", "status": "success"})

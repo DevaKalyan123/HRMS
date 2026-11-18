@@ -12,7 +12,9 @@ class DashboardController:
     @staticmethod
     def add_task():
         return dashboard_service.add_task()
-
+    @staticmethod
+    def submit_task(task_id):
+        return dashboard_service.submit_task(task_id)
     @staticmethod
     def api_dashboard():
         return dashboard_service.api_dashboard()

@@ -63,13 +63,21 @@ def update_profile():
 def delete_user(user_id):
     return AdminController.delete_user(user_id)
 
+
+@admin_bp.route('/assign-task', methods=['POST'])
+def assign_task():
+    return AdminController.assign_task()
+
+
 @admin_bp.route('/approve-task/<int:task_id>', methods=['GET'])
 def approve_task(task_id):
     return AdminController.approve_task(task_id)
-
 @admin_bp.route('/reject-task/<int:task_id>', methods=['GET'])
 def reject_task(task_id):
-    return AdminController.reject_task(task_id)
+        return AdminController.reject_task(task_id)
+@admin_bp.route('/task-document/<int:task_id>', methods=['GET'])
+def view_task_document(task_id):
+    return AdminController.view_task_document(task_id)
 
 @admin_bp.route('/api-data', methods=['GET'])
 def admin_api_data():

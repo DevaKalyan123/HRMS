@@ -820,7 +820,23 @@ def upload_rota():
                 file_hash
             )
         )
+# ---------------------------------------------
+# SEND ROTA UPLOAD NOTIFICATION TO ALL EMPLOYEES
+# ---------------------------------------------
 
+        cursor.execute("SELECT id FROM users WHERE is_admin = 0")
+        users = cursor.fetchall()
+
+        for user in users:
+            cursor.execute("""
+                INSERT INTO notifications (message, user_id)
+                VALUES (%s, %s)
+            """, (
+                f"New Rota Schedule uploaded by Admin: {filename}",
+                user['id']
+            ))
+
+        # Save rota and notifications together
         conn.commit()
 
         # Return current file immediately
@@ -961,6 +977,7 @@ def upload_holiday():
 
         cursor = conn.cursor()
 
+
         # Check whether rota row already exists
         cursor.execute(
             "SELECT id FROM rota ORDER BY id DESC LIMIT 1"
@@ -969,30 +986,42 @@ def upload_holiday():
         existing_row = cursor.fetchone()
 
         if existing_row:
-
-            # Keep existing rota image
-            cursor.execute(
-                """
+            # Update existing holiday list
+            cursor.execute("""
                 UPDATE rota
                 SET holiday_table = %s
                 WHERE id = %s
-                """,
-                (
-                    table_html,
-                    existing_row[0]
-                )
-            )
-
+            """, (
+                table_html,
+                existing_row[0]
+            ))
         else:
-
-            cursor.execute(
-                """
+            # Insert new holiday list
+            cursor.execute("""
                 INSERT INTO rota (holiday_table)
                 VALUES (%s)
-                """,
-                (table_html,)
-            )
+            """, (table_html,))
 
+        # ---------------------------------------------
+        # SEND HOLIDAY NOTIFICATION TO ALL EMPLOYEES
+        # ---------------------------------------------
+
+        cursor.execute("""
+            SELECT id FROM users WHERE is_admin = 0
+        """)
+
+        users = cursor.fetchall()
+
+        for user in users:
+            cursor.execute("""
+                INSERT INTO notifications (message, user_id)
+                VALUES (%s, %s)
+            """, (
+                f"New Holiday List uploaded by Admin: {filename}",
+                user[0]
+            ))
+
+        # Save holiday list and notifications together
         conn.commit()
 
         cursor.close()
@@ -1239,6 +1268,119 @@ def delete_user(user_id):
     finally:
         cursor.close()
         conn.close()
+
+
+def assign_task():
+    # Only logged-in admins can assign tasks
+    if 'user_id' not in session or not session.get('is_admin'):
+        return jsonify({
+            "success": False,
+            "message": "Admin access required"
+        }), 403
+
+    employee_id = request.form.get('employee_id', '').strip()
+    project_name = request.form.get('project_name', '').strip()
+    task_name = request.form.get('task_name', '').strip()
+    from_date = request.form.get('from_date', '').strip()
+    to_date = request.form.get('to_date', '').strip()
+
+    if not all([employee_id, project_name, task_name, from_date, to_date]):
+        return jsonify({
+            "success": False,
+            "message": "Please fill in all task details"
+        }), 400
+
+    try:
+        employee_id = int(employee_id)
+        start_date = datetime.strptime(from_date, "%Y-%m-%d").date()
+        end_date = datetime.strptime(to_date, "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        return jsonify({
+            "success": False,
+            "message": "Invalid employee ID or date format"
+        }), 400
+
+    if end_date < start_date:
+        return jsonify({
+            "success": False,
+            "message": "To Date cannot be earlier than From Date"
+        }), 400
+
+    conn = get_db_connection()
+
+    if not conn:
+        return jsonify({
+            "success": False,
+            "message": "Database connection failed"
+        }), 500
+
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Confirm the selected employee exists and is not an admin
+        cursor.execute("""
+            SELECT id, username
+            FROM users
+            WHERE id = %s AND is_admin = 0
+        """, (employee_id,))
+
+        employee = cursor.fetchone()
+
+        if not employee:
+            return jsonify({
+                "success": False,
+                "message": "Selected employee was not found"
+            }), 404
+
+        time_period = (
+            f"{start_date.strftime('%Y-%m-%d')} To "
+            f"{end_date.strftime('%Y-%m-%d')}"
+        )
+
+        cursor.execute("""
+            INSERT INTO daily_tasks
+                (employee_id, project_name, task_name, time_period, status)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (
+            employee_id,
+            project_name,
+            task_name,
+            time_period,
+            'Pending'
+        ))
+
+        task_id = cursor.lastrowid
+
+        cursor.execute("""
+            INSERT INTO notifications (message, user_id)
+            VALUES (%s, %s)
+        """, (
+            f"New task assigned: '{task_name}' "
+            f"for project '{project_name}' ({time_period}).",
+            employee_id
+        ))
+
+        conn.commit()
+
+        return jsonify({
+            "success": True,
+            "message": f"Task assigned to {employee['username']} successfully",
+            "task_id": task_id
+        }), 201
+
+    except Exception as e:
+        conn.rollback()
+        logging.exception("Task assignment failed")
+
+        return jsonify({
+            "success": False,
+            "message": "Unable to assign task. Please check the server logs."
+        }), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
 
 
 def approve_task(task_id):
@@ -1687,3 +1829,79 @@ def admin_api_data():
         if conn and conn.is_connected():
             cursor.close()
             conn.close()
+def view_task_document(task_id):
+
+    # Only logged-in Admin can view task documents
+    if 'user_id' not in session or not session.get('is_admin'):
+        return jsonify({
+            "success": False,
+            "message": "Admin access required"
+        }), 403
+
+    conn = get_db_connection()
+
+    if not conn:
+        return jsonify({
+            "success": False,
+            "message": "Database connection failed"
+        }), 500
+
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT document_path
+            FROM daily_tasks
+            WHERE id = %s
+        """, (task_id,))
+
+        task = cursor.fetchone()
+
+        if not task or not task.get('document_path'):
+            return jsonify({
+                "success": False,
+                "message": "Document not found"
+            }), 404
+
+        # Backend folder path
+        backend_folder = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
+
+        document_path = os.path.abspath(
+            os.path.join(backend_folder, task['document_path'])
+        )
+
+        # Prevent access outside backend folder
+        if os.path.commonpath([
+            backend_folder,
+            document_path
+        ]) != os.path.abspath(backend_folder):
+            return jsonify({
+                "success": False,
+                "message": "Invalid document path"
+            }), 403
+
+        if not os.path.isfile(document_path):
+            return jsonify({
+                "success": False,
+                "message": "Uploaded document does not exist"
+            }), 404
+
+        return send_file(
+            document_path,
+            as_attachment=False,
+            download_name=os.path.basename(document_path)
+        )
+
+    except Exception as e:
+        logging.exception("View task document error")
+
+        return jsonify({
+            "success": False,
+            "message": "Unable to open task document"
+        }), 500
+
+    finally:
+        cursor.close()
+        conn.close()
